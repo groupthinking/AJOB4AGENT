@@ -25,7 +25,10 @@ async function findUserById(userId: number): Promise<User | null> {
 export const subscriptionCheck = async (req: Request, res: Response, next: NextFunction) => {
     // CRITICAL PREREQUISITE: A real authentication middleware must run before this
     // to identify the user and attach their ID to the request object.
-    const userId = (req as any).userId; 
+export const subscriptionCheck = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    // CRITICAL PREREQUISITE: A real authentication middleware must run before this
+    // to identify the user and attach their ID to the request object.
+    const userId = req.userId; 
     if (!userId) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized. No user identified.' });
     }
