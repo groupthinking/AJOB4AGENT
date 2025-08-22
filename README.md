@@ -179,10 +179,50 @@ cd services/llm-service && pytest
 
 ## 📊 Monitoring
 
-- **Health Checks**: All services expose `/health` endpoints
-- **Metrics**: Prometheus metrics available at `/metrics`  
-- **Logging**: Centralized logging with structured JSON format
+- **Health Checks**: All services expose `/health` endpoints with detailed status
+- **Metrics**: Prometheus metrics available at `/metrics` endpoints
+- **Logging**: Centralized structured JSON logging with request tracing
 - **Alerts**: Configurable alerts for failed applications and system issues
+
+### Production Monitoring Stack
+
+Deploy comprehensive monitoring for production:
+
+```bash
+# Start with monitoring stack
+docker-compose -f docker-compose.yml -f monitoring/docker-compose.monitoring.yml up -d
+
+# Access monitoring services
+# Grafana: http://localhost:3000 (admin/admin123)  
+# Prometheus: http://localhost:9090
+# AlertManager: http://localhost:9093
+```
+
+**Monitoring Features:**
+- Real-time application metrics and system monitoring
+- Custom Grafana dashboards for job processing analytics
+- Automated alerting via Slack, email, or webhooks
+- Performance tracking and capacity planning
+- Error rate and success rate monitoring
+
+### Basic Monitoring Commands
+
+```bash
+# Check service status
+docker-compose ps
+
+# View logs  
+docker-compose logs -f [service-name]
+
+# Resource usage
+docker stats
+
+# Run health checks
+./tests/integration-test.sh health
+
+# View application metrics
+curl http://localhost:8001/metrics
+```
 
 ## 🤝 Contributing
 
@@ -202,6 +242,18 @@ This tool is designed to assist in job searching and should be used in complianc
 
 ## 🆘 Support
 
-- 📖 [Documentation](docs/)
+### Documentation
+- 📖 [Quick Start Guide](QUICKSTART.md) - Get up and running in 5 minutes
+- 🔧 [Operations Guide](docs/OPERATIONS.md) - Production deployment and monitoring
+- 📚 [API Documentation](docs/api/README.md) - Complete API reference with examples
+- 🔧 [Development Setup](scripts/setup-dev.sh) - Automated development environment setup
+
+### Community & Support
 - 🐛 [Report Issues](https://github.com/groupthinking/AJOB4AGENT/issues)
 - 💬 [Discussions](https://github.com/groupthinking/AJOB4AGENT/discussions)
+- 📧 Email: support@ajob4agent.com (for enterprise support)
+
+### Scripts & Tools
+- `./scripts/setup-dev.sh` - One-click development setup
+- `./scripts/deploy.sh` - Production deployment with health checks  
+- `./tests/integration-test.sh` - Comprehensive testing suite
