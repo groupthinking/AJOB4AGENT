@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from .models import TailoringPayload, TailoredOutput
+from models import TailoringPayload, TailoredOutput
 import random
 
 app = FastAPI()
