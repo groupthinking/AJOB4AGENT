@@ -24,7 +24,16 @@ router.post('/create-checkout-session', async (req: Request, res: Response) => {
     try {
         // Create a Stripe customer for the user if one doesn't exist
         const customer = await stripe.customers.create({
-            email: (req as any).user.email, // Assuming user email is on the request
+    // Validate that user and user.email exist on the request object
+    const user = (req as any).user;
+    if (!user || !user.email) {
+        return res.status(400).json({ error: 'Missing user email on request' });
+    }
+
+    try {
+        // Create a Stripe customer for the user if one doesn't exist
+        const customer = await stripe.customers.create({
+            email: user.email, // Safe to access after validation
             metadata: {
                 userId: userId, // Our internal user ID
             },
