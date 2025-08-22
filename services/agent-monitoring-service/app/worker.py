@@ -31,7 +31,18 @@ def main():
             db_log = ApplicationLog(
                 job_id=log_data.get('job_id'),
                 platform=log_data.get('platform'),
-                status=ApplicationStatus[log_data.get('status')],
+            try:
+                status_value = log_data.get('status')
+                status_enum = ApplicationStatus(status_value)
+            except (ValueError, TypeError) as e:
+                print(f"[!] Invalid status value '{log_data.get('status')}' for job {log_data.get('job_id')}: {e}")
+                db.close()
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                return
+            db_log = ApplicationLog(
+                job_id=log_data.get('job_id'),
+                platform=log_data.get('platform'),
+                status=status_enum,
                 details=log_data.get('details')
             )
             db.add(db_log)
