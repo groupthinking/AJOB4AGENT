@@ -14,7 +14,9 @@ async function updateUserStripeCustomerId(userId: number, customerId: string): P
 
 router.post('/create-checkout-session', async (req: Request, res: Response) => {
     // A real auth middleware must place userId on the request object first
-    const userId = (req as any).userId; 
+router.post('/create-checkout-session', async (req: AuthedRequest, res: Response) => {
+    // A real auth middleware must place userId on the request object first
+    const userId = req.userId; 
     const { priceId } = req.body; // e.g., 'price_...' for the PRO plan
 
     if (!userId || !priceId) {
