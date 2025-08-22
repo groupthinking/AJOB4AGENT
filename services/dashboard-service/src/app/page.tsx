@@ -29,7 +29,7 @@ export default function Dashboard() {
         const data: LogEntry[] = await response.json();
         setLogs(data);
       } catch (err) {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : String(err));
       }
     };
 
