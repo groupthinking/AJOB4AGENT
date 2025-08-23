@@ -1,5 +1,6 @@
 import { IApplyAgent, TailoredOutput } from './agent.interface';
 import { chromium, Browser, Page } from 'playwright';
+import { Channel } from 'amqplib';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { tmpdir } from 'os';
@@ -32,7 +33,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
         }
     }
 
-    async apply(): Promise<void> {
+    async apply(channel: Channel): Promise<void> {
         let browser: Browser | null = null;
         console.log(`[LinkedInAgent] Starting application for ${this.payload.job_url}`);
         try {
@@ -46,10 +47,11 @@ export class LinkedInApplyAgent implements IApplyAgent {
             await this.fillApplication(page);
             await this.submitApplication(page);
 
-            await this.reportStatus('success', 'Application submitted successfully via Easy Apply.');
+            await this.reportStatus(channel, 'success', 'Application submitted successfully via Easy Apply.');
         } catch (error) {
             console.error(`[LinkedInAgent] FAILED to apply for ${this.payload.job_id}:`, error);
-            await this.reportStatus('failure', error.message);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            await this.reportStatus(channel, 'failure', errorMessage);
         } finally {
             if (browser) {
                 await browser.close();
@@ -146,8 +148,9 @@ export class LinkedInApplyAgent implements IApplyAgent {
         }
     }
 
-    async reportStatus(status: 'success' | 'failure', details: string): Promise<void> {
+    async reportStatus(channel: Channel, status: 'success' | 'failure', details: string): Promise<void> {
         // ... (implementation from previous step)
         console.log(`[LinkedInAgent] STATUS: ${status} | JOB: ${this.payload.job_id} | DETAILS: ${details}`);
+        // TODO: Publish message to channel for real implementation
     }
 }
