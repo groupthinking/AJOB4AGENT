@@ -8,8 +8,8 @@ import {
   EyeIcon,
   BriefcaseIcon
 } from '@heroicons/react/24/outline'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn, formatRelativeTime, getStatusColor } from '@/lib/utils'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { cn, formatRelativeTime, getStatusColor } from '../../lib/utils'
 
 interface LogEntry {
   id: number
