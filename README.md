@@ -48,19 +48,19 @@ AJOB4AGENT is a comprehensive job application automation platform that:
 The system uses a microservices architecture with the following components:
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Dashboard      │    │ Agent            │    │ LLM Service     │
-│  Service        │◄──►│ Orchestrator     │◄──►│                 │
-│  (Frontend)     │    │ (Core Logic)     │    │ (AI Processing) │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌──────────────────┐
-                    │ Monitoring       │
-                    │ Service          │
-                    │ (Analytics)      │
-                    └──────────────────┘
++-------------------+    +--------------------+    +-------------------+
+|  Dashboard        |    | Agent              |    | LLM Service       |
+|  Service          |<-->| Orchestrator       |<-->|                   |
+|  (Frontend)       |    | (Core Logic)       |    | (AI Processing)   |
++-------------------+    +--------------------+    +-------------------+
+        |                         |                         |
+        +-------------------------+-------------------------+
+                                  |
+                    +--------------------+
+                    | Monitoring         |
+                    | Service            |
+                    | (Analytics)        |
+                    +--------------------+
 ```
 
 ### Services
