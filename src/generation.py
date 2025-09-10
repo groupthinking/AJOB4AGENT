@@ -142,6 +142,6 @@ Structure the output clearly with Markdown headings. Do not include any informat
         print(f"✅ Successfully saved interview pack to {filepath}")
         return filepath
 
-    except Exception as e:
+    except openai.APIError as e:
         print(f"❌ An error occurred during LLM call for interview pack: {e}")
         return None
