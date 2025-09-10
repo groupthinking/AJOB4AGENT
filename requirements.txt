@@ -1,0 +1,17 @@
+# Core application dependencies
+fastapi
+uvicorn[standard]
+python-dotenv
+jinja2
+pandas
+requests
+openai
+
+# For serving HTMX dashboard
+aiofiles
+
+# For web scraping in interview pack generator (optional, but good to have)
+beautifulsoup4
+
+# For email
+secure-smtplib

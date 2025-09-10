@@ -66,13 +66,19 @@ venv/
 ENV/
 env/
 .env
+=======
+
+# Build outputs
+dist/
+build/
+.next/
+out/
 
 # IDE
 .vscode/
 .idea/
 *.swp
-*.swo
-*~
+*.swo*~
 
 # OS
 .DS_Store
@@ -97,3 +103,38 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Docker
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.coverage
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
