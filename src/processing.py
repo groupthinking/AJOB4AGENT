@@ -96,7 +96,7 @@ def score_jobs(df: pd.DataFrame, resume_text: str) -> pd.DataFrame:
 
     # Create a regex pattern to find any of the skills (as whole words)
     # This avoids matching "ai" in "strait"
-    skills_pattern = r'\b(' + '|'.join(re.escape(skill) for skill in skills) + r')\b'
+    skills_pattern = r'\b(' + '|'.join(re.escape(skill.strip()) for skill in skills) + r')\b'
 
     def calculate_score(description: str) -> int:
         if not isinstance(description, str):
