@@ -43,10 +43,10 @@ def normalize_and_filter_jobs(df: pd.DataFrame, settings: Settings) -> pd.DataFr
     if 'compensation' in filtered_df.columns:
         # Convert compensation to numeric, setting errors to NaN (Not a Number)
         filtered_df['compensation'] = pd.to_numeric(filtered_df['compensation'], errors='coerce')
-        # Drop rows where compensation is not a valid number
-        filtered_df.dropna(subset=['compensation'], inplace=True)
-        # Apply the filter
-        comp_mask = filtered_df['compensation'] >= settings.MIN_COMPENSATION
+        # Replace NaN values with 'N/A' for consistency
+        filtered_df['compensation'] = filtered_df['compensation'].fillna('N/A')
+        # Apply the filter, only to rows with valid numeric compensation
+        comp_mask = (filtered_df['compensation'] != 'N/A') & (filtered_df['compensation'] >= settings.MIN_COMPENSATION)
         filtered_df = filtered_df[comp_mask]
         print(f"Found {len(filtered_df)} jobs after compensation filter.")
 
