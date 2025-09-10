@@ -26,7 +26,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
             await fs.unlink(this.tempResumePath);
         } catch (error) {
             // Ignore errors if file doesn't exist
-            if (error.code !== 'ENOENT') {
+            if ('code' in error && error.code !== 'ENOENT') {
                 console.error(`[LinkedInAgent] Failed to clean up temp file: ${this.tempResumePath}`, error);
             }
         }
