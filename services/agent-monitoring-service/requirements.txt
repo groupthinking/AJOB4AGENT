@@ -1,7 +1,0 @@
-pika
-sqlalchemy
-psycopg2-binary
-pydantic
-alembic
-fastapi
-uvicorn[standard]
