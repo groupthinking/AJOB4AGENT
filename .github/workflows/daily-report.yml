@@ -1,0 +1,60 @@
+name: Daily Job Engine
+
+on:
+  schedule:
+    - cron: "0 13 * * 1-5"   # 08:00 America/Chicago
+  workflow_dispatch: {}
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt || true
+
+      - name: Run pipeline (safe if scripts exist)
+        run: |
+          . .venv/bin/activate
+          if [ -f scripts/run_pipeline.py ]; then
+            python scripts/run_pipeline.py all || true
+          fi
+
+      - name: Build report
+        run: |
+          . .venv/bin/activate
+          if [ -f scripts/generate_report.py ]; then
+            python scripts/generate_report.py
+          else
+            mkdir -p reports
+            echo "<html><body><h1>Daily Job Report</h1><p>No generator script found.</p></body></html>" > reports/daily_report.html
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-report
+          path: reports/daily_report.html
+
+      - name: Email report
+        uses: dawidd6/action-send-mail@v3
+        continue-on-error: true
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT || 587 }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Daily Job Search Report"
+          to: ${{ secrets.SMTP_TO }}
+          from: ${{ secrets.SMTP_FROM }}
+          content_type: text/html
+          html_body: file://reports/daily_report.html
