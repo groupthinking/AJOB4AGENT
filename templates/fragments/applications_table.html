@@ -13,7 +13,7 @@
             {% if applications %}
                 {% for app in applications %}
                 <tr>
-                    <td>{{ app.timestamp.split('T')[0] }}</td>
+                    <td>{{ app.timestamp|date('YYYY-MM-DD') }}</td>
                     <td>{{ app.company }}</td>
                     <td>{{ app.title }}</td>
                     <td>{{ app.score }}</td>
