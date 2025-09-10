@@ -6,8 +6,8 @@ load_dotenv()
 
 class Settings:
     # Job Targeting
-    JOB_TITLES = os.getenv("JOB_TITLES", "").split(',')
-    JOB_GEOS = os.getenv("JOB_GEOS", "").split(',')
+    JOB_TITLES = [t.strip() for t in os.getenv("JOB_TITLES", "").split(',') if t.strip()]
+    JOB_GEOS = [g.strip() for g in os.getenv("JOB_GEOS", "").split(',') if g.strip()]
     MIN_COMPENSATION = int(os.getenv("MIN_COMPENSATION", 0))
 
     # OpenAI API Key
