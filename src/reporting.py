@@ -6,14 +6,21 @@ from typing import Dict, Any, Optional
 
 def generate_html_report(summary_data: Dict[str, Any], applications_df: pd.DataFrame) -> Optional[str]:
     """
-    Generates an HTML report from the pipeline's results.
-
-    Args:
-        summary_data: A dictionary with summary statistics for the report.
-        applications_df: A DataFrame of the applications processed in this run.
-
+    Generate an HTML report from summary statistics and an applications DataFrame.
+    
+    Renders the Jinja2 template located at `templates/report_template.html` using a context that includes:
+    - `generation_date` (current timestamp),
+    - `summary` (the provided summary_data),
+    - `applications` (applications_df converted to a list of record dicts, or an empty list if the DataFrame is empty).
+    
+    If the `templates` directory is missing or writing the output file fails, the function returns None. On success it writes the rendered HTML to `reports/daily_report.html` (creating the `reports` directory if needed) and returns the path to the generated file.
+    
+    Parameters:
+        summary_data: Summary statistics and values to expose to the template.
+        applications_df: DataFrame of applications processed in this run; converted to template-friendly records.
+    
     Returns:
-        The path to the generated report, or None if an error occurred.
+        The filesystem path to the generated HTML report (str), or None if generation failed.
     """
     if not os.path.exists('templates'):
         print("❌ Error: 'templates' directory not found.")

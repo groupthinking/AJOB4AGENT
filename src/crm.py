@@ -18,12 +18,9 @@ def clean_crm_logs():
 
 def update_application_log(job_details: pd.Series, resume_path: Optional[str], status: str):
     """
-    Logs a new or updated application entry to the applications CSV.
-
-    Args:
-        job_details: A pandas Series representing the job.
-        resume_path: The path to the generated resume variant.
-        status: The current status of the application (e.g., 'resume_generated').
+    Append a new application record to crm/applications.csv.
+    
+    Creates a single-row log entry using job_details (job_details.name as job_id) with a generated application_id and ISO timestamp, company, title, status, resume_variant_path (uses "N/A" when resume_path is None or empty), and score, then appends it to crm/applications.csv. Writes CSV headers only when the file does not exist or is empty. I/O errors are caught and reported via printed messages; this function does not raise on write failure.
     """
     log_path = 'crm/applications.csv'
 

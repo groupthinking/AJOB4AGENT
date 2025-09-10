@@ -5,7 +5,19 @@ from src.config import settings
 
 def send_report_email(html_content: str):
     """
-    Sends the HTML report via email using SMTP settings.
+    Send an HTML report via SMTP using configuration from src.config.settings.
+    
+    If settings.EMAIL_ENABLED is falsy the function returns without sending. When enabled,
+    the function composes a multipart HTML email (Subject: "AJOB4AGENT Daily Report - {SMTP_FROM}"),
+    connects to the SMTP server over SSL (SMTP_HOST, SMTP_PORT), authenticates with
+    SMTP_USERNAME/SMTP_PASSWORD, and sends the message from SMTP_FROM to SMTP_TO.
+    Status and errors are reported with print statements.
+    
+    Parameters:
+        html_content (str): HTML string used as the email body.
+    
+    Returns:
+        None
     """
     if not settings.EMAIL_ENABLED:
         print("📧 Email sending is disabled. Skipping.")

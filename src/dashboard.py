@@ -9,7 +9,17 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    """Serves the main dashboard page."""
+    """
+    Render and return the main dashboard HTML page.
+    
+    Renders the "dashboard.html" Jinja2 template with the provided Request in the template context and returns a TemplateResponse suitable for an HTML response.
+    
+    Parameters:
+        request (Request): The incoming HTTP request; included in the template context for URL generation and request-specific data.
+    
+    Returns:
+        templates.TemplateResponse: A TemplateResponse containing the rendered dashboard HTML.
+    """
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
 @app.get("/data/applications", response_class=HTMLResponse)
