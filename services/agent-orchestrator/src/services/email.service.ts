@@ -24,7 +24,11 @@ export class EmailService {
   constructor() {
     this.config = {
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
+      port: (() => {
+        const portStr = process.env.SMTP_PORT;
+        const portNum = portStr ? parseInt(portStr, 10) : 587;
+        return Number.isNaN(portNum) ? 587 : portNum;
+      })(),
       username: process.env.SMTP_USERNAME || '',
       password: process.env.SMTP_PASSWORD || '',
       from: process.env.SMTP_FROM || ''
