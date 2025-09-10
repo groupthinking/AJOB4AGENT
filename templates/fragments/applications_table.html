@@ -1,0 +1,30 @@
+<figure>
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Company</th>
+                <th scope="col">Title</th>
+                <th scope="col">Score</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if applications %}
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.timestamp|date('YYYY-MM-DD') }}</td>
+                    <td>{{ app.company }}</td>
+                    <td>{{ app.title }}</td>
+                    <td>{{ app.score }}</td>
+                    <td><code>{{ app.status }}</code></td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5">No applications found in crm/applications.csv.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</figure>

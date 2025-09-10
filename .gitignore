@@ -23,12 +23,37 @@ out/
 *.egg-info/
 dist/
 build/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+.next/
+*/.next/
 
 # Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*/.env
+*/.env.local
+
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -83,6 +108,59 @@ __MACOSX/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+=======
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+.env
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # Docker
 .docker/
@@ -94,6 +172,14 @@ logs
 # Database
 *.sqlite
 *.db
+=======
+# Testing
+coverage/
+.nyc_output
+.coverage
+
+# TypeScript
+*.tsbuildinfo
 
 # Temporary files
 tmp/
@@ -152,3 +238,38 @@ coverage.xml
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Docker
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.coverage
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
