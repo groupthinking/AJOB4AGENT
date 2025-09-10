@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from .models import TailoringPayload, TailoredOutput, HealthResponse
+from models import TailoringPayload, TailoredOutput, HealthResponse
 import logging
 import structlog
 import time

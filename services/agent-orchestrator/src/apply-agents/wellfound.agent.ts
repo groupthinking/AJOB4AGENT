@@ -1,5 +1,6 @@
 import { IApplyAgent, TailoredOutput } from './agent.interface';
 import { chromium, Browser, Page } from 'playwright';
+import { Channel } from 'amqplib';
 
 export class WellfoundApplyAgent implements IApplyAgent {
     payload: TailoredOutput;
@@ -11,7 +12,7 @@ export class WellfoundApplyAgent implements IApplyAgent {
         this.payload = payload;
     }
 
-    async apply(): Promise<void> {
+    async apply(channel: Channel): Promise<void> {
         let browser: Browser | null = null;
         console.log(`[WellfoundAgent] Starting application for ${this.payload.job_url}`);
         try {
@@ -24,10 +25,10 @@ export class WellfoundApplyAgent implements IApplyAgent {
             await this.fillApplication(page);
             await this.submitApplication(page);
 
-            await this.reportStatus('success', 'Application submitted successfully.');
+            await this.reportStatus(channel, 'success', 'Application submitted successfully.');
         } catch (error) {
             console.error(`[WellfoundAgent] FAILED to apply for ${this.payload.job_id}:`, error);
-            await this.reportStatus('failure', error.message);
+            await this.reportStatus(channel, 'failure', error instanceof Error ? error.message : String(error));
         } finally {
             if (browser) {
                 await browser.close();
@@ -95,7 +96,7 @@ export class WellfoundApplyAgent implements IApplyAgent {
         }
     }
 
-    async reportStatus(status: 'success' | 'failure', details: string): Promise<void> {
+    async reportStatus(channel: Channel, status: 'success' | 'failure', details: string): Promise<void> {
         console.log(`[WellfoundAgent] STATUS: ${status} | JOB: ${this.payload.job_id} | DETAILS: ${details}`);
     }
 }

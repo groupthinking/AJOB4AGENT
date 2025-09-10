@@ -1,5 +1,6 @@
 import { IApplyAgent, TailoredOutput } from './agent.interface';
 import { Page } from 'playwright';
+import { Channel } from 'amqplib';
 
 export class GlassdoorApplyAgent implements IApplyAgent {
     payload: TailoredOutput;
@@ -8,7 +9,7 @@ export class GlassdoorApplyAgent implements IApplyAgent {
         this.payload = payload;
     }
 
-    async apply(): Promise<void> {
+    async apply(channel: Channel): Promise<void> {
         console.log(`[GlassdoorAgent] Starting application for ${this.payload.job_url}`);
         // Full browser lifecycle management will be implemented here
     }
@@ -50,7 +51,7 @@ export class GlassdoorApplyAgent implements IApplyAgent {
         // - Final submit button will have a selector like `button[data-test="submit-application"]`.
     }
 
-    async reportStatus(status: 'success' | 'failure', details: string): Promise<void> {
+    async reportStatus(channel: Channel, status: 'success' | 'failure', details: string): Promise<void> {
         console.log(`[GlassdoorAgent] STATUS: ${status} | JOB: ${this.payload.job_id} | DETAILS: ${details}`);
     }
 }

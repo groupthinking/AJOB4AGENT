@@ -3,6 +3,7 @@ import { chromium, Browser, Page } from 'playwright';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { tmpdir } from 'os';
+import { Channel } from 'amqplib';
 
 export class LinkedInApplyAgent implements IApplyAgent {
     payload: TailoredOutput;
@@ -26,13 +27,13 @@ export class LinkedInApplyAgent implements IApplyAgent {
             await fs.unlink(this.tempResumePath);
         } catch (error) {
             // Ignore errors if file doesn't exist
-            if ('code' in error && error.code !== 'ENOENT') {
+            if (error && typeof error === 'object' && 'code' in error && (error as any).code !== 'ENOENT') {
                 console.error(`[LinkedInAgent] Failed to clean up temp file: ${this.tempResumePath}`, error);
             }
         }
     }
 
-    async apply(): Promise<void> {
+    async apply(channel: Channel): Promise<void> {
         let browser: Browser | null = null;
         console.log(`[LinkedInAgent] Starting application for ${this.payload.job_url}`);
         try {
@@ -46,10 +47,10 @@ export class LinkedInApplyAgent implements IApplyAgent {
             await this.fillApplication(page);
             await this.submitApplication(page);
 
-            await this.reportStatus('success', 'Application submitted successfully via Easy Apply.');
+            await this.reportStatus(channel, 'success', 'Application submitted successfully via Easy Apply.');
         } catch (error) {
             console.error(`[LinkedInAgent] FAILED to apply for ${this.payload.job_id}:`, error);
-            await this.reportStatus('failure', error.message);
+            await this.reportStatus(channel, 'failure', error instanceof Error ? error.message : String(error));
         } finally {
             if (browser) {
                 await browser.close();
@@ -104,7 +105,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
 
             // Handle Cover Letter
             const coverLetterTextarea = modal.locator('textarea[aria-label="Cover letter"]');
-             if (await coverLetterTextarea.isVisible()) {
+            if (await coverLetterTextarea.isVisible()) {
                 console.log('[LinkedInAgent] Found cover letter field. Pasting content...');
                 await coverLetterTextarea.fill(this.payload.cover_letter);
             }
@@ -114,7 +115,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
                 console.log('[LinkedInAgent] Reached final submission step.');
                 break;
             }
-             if (await reviewButton.isVisible()) {
+            if (await reviewButton.isVisible()) {
                 console.log('[LinkedInAgent] Reached review step. Clicking to proceed to final submission.');
                 await reviewButton.click();
                 await page.waitForTimeout(2000); // Wait for final page to load
@@ -146,7 +147,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
         }
     }
 
-    async reportStatus(status: 'success' | 'failure', details: string): Promise<void> {
+    async reportStatus(channel: Channel, status: 'success' | 'failure', details: string): Promise<void> {
         // ... (implementation from previous step)
         console.log(`[LinkedInAgent] STATUS: ${status} | JOB: ${this.payload.job_id} | DETAILS: ${details}`);
     }
