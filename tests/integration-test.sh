@@ -188,7 +188,7 @@ case "${1:-test}" in
         echo "  test        - Run all tests (default)"
         echo "  health      - Test health endpoints only"
         echo "  llm         - Test LLM service only"
-        echo "  orchestrator- Test orchestrator service only" 
+        echo "  orchestrator   - Test orchestrator service only"
         echo "  dashboard   - Test dashboard service only"
         echo "  database    - Test database connectivity only"
         echo "  queue       - Test message queue connectivity only"
