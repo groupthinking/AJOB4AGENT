@@ -15,15 +15,16 @@ def get_openai_client() -> Optional[openai.OpenAI]:
 
 def generate_resume_variant(client: openai.OpenAI, resume_text: str, job_details: Dict) -> Optional[str]:
     """
-    Uses an LLM to generate a resume variant tailored to a specific job.
-
-    Args:
-        client: The OpenAI client instance.
-        resume_text: The content of the master resume.
-        job_details: A dictionary (or pandas Series) containing job info.
-
+    Generate a tailored resume Markdown file for a specific job using the provided OpenAI client.
+    
+    Given a master resume and job details, prompts an LLM to rephrase, reorder, and emphasize existing information to better match the job (quantifying achievements where possible) without inventing new experiences. Saves the result to out/resume_variants/resume_<company>_<title>.md and returns the saved file path.
+    
+    Parameters:
+        resume_text (str): Full master resume content to be tailored.
+        job_details (dict or pandas.Series): Job information with expected keys 'company', 'title', and optionally 'description'.
+    
     Returns:
-        The file path of the generated resume, or None if an error occurred.
+        Optional[str]: Path to the saved Markdown file on success, or None if the client is falsy or an error occurs.
     """
     if not client:
         return None
@@ -91,7 +92,15 @@ Produce the full, tailored resume as a complete Markdown document.
 
 def create_interview_pack(client: openai.OpenAI, company_name: str, articles_text: str) -> Optional[str]:
     """
-    Uses an LLM to create an interview pack from a collection of articles.
+    Create an interview preparation pack for a company from provided article text using the given OpenAI client.
+    
+    The function asks the LLM to produce a Markdown-formatted "Interview Preparation Pack" containing three sections: a one-paragraph Company Summary, a bulleted Key Developments list, and 3–5 Potential Talking Points & Questions. The LLM must base its output strictly on the supplied articles_text. If successful, the report is written to reports/interview_pack_<safe_company>.md and the file path is returned.
+    
+    Preconditions:
+    - A valid OpenAI client must be provided; if not, the function returns None.
+    
+    Returns:
+    - The path to the saved Markdown file on success, or None if the client is missing or an error occurs.
     """
     if not client:
         print("⚠️ OpenAI client not available, skipping interview pack generation.")

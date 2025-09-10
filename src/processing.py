@@ -4,14 +4,9 @@ from src.config import Settings
 
 def normalize_and_filter_jobs(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     """
-    Normalizes and filters the jobs DataFrame based on user-defined criteria.
-
-    Args:
-        df: The raw jobs DataFrame.
-        settings: The application settings object.
-
-    Returns:
-        A filtered and cleaned DataFrame.
+    Normalize and filter a jobs DataFrame according to the provided Settings.
+    
+    If df is None or empty, returns an empty DataFrame. Operates on a copy of the input (the original DataFrame is not modified). When present, normalizes 'title', 'location', and 'description' to lowercase, stripped strings. Filters rows whose title matches any entry in settings.JOB_TITLES and whose location matches any entry in settings.JOB_GEOS (case-insensitive substring/contains matching). If a 'compensation' column exists, coerces it to numeric, drops non-numeric rows, and filters to keep only rows with compensation >= settings.MIN_COMPENSATION. Returns the resulting filtered DataFrame.
     """
     if df is None or df.empty:
         return pd.DataFrame()
@@ -58,8 +53,12 @@ import re
 
 def extract_skills_from_resume(resume_text: str) -> List[str]:
     """
-    Extracts skills from the 'SKILLS' section of a markdown resume.
-    Assumes skills are bullet points starting with '-'.
+    Extract a list of skills from the "## SKILLS" section of a markdown-formatted resume.
+    
+    Searches case-insensitively for a top-level "## SKILLS" header and captures text until the next "##" header or end of document. From that section, it extracts lines starting with a dash ('-') as bullet items, splits comma-separated items on the same line, strips surrounding whitespace, and lowercases each skill. Returns an empty list if no SKILLS section is found.
+    
+    Returns:
+        List[str]: A list of skill strings in lowercase with empty entries removed.
     """
     # Regex to find the content between "## SKILLS" and the next "##" section
     skills_section_match = re.search(r"##\s*SKILLS\s*\n(.*?)(?=\n##|$)", resume_text, re.DOTALL | re.IGNORECASE)
@@ -81,7 +80,9 @@ def extract_skills_from_resume(resume_text: str) -> List[str]:
 
 def score_jobs(df: pd.DataFrame, resume_text: str) -> pd.DataFrame:
     """
-    Scores jobs based on how many resume skills appear in the job description.
+    Score each job by the number of unique skills from a resume that appear in the job description.
+    
+    If df is empty, it is returned unchanged. Resume skills are extracted with extract_skills_from_resume(resume_text); if no skills are found, a 'score' column with 0 is added to df and df is returned. Matching uses whole-word, case-insensitive regexes built from the extracted skills; each unique matched skill contributes 1 to the score. The returned DataFrame contains a new 'score' column and is sorted by 'score' in descending order.
     """
     if df.empty:
         return df
@@ -99,6 +100,11 @@ def score_jobs(df: pd.DataFrame, resume_text: str) -> pd.DataFrame:
     skills_pattern = r'\b(' + '|'.join(re.escape(skill.strip()) for skill in skills) + r')\b'
 
     def calculate_score(description: str) -> int:
+        """
+        Count unique resume skills found in a job description.
+        
+        Returns the number of distinct skill matches (using the outer-scope `skills_pattern` regex) found in the provided job description text. Matching is case-insensitive and counts each skill at most once. If `description` is not a string, returns 0.
+        """
         if not isinstance(description, str):
             return 0
         # Find all unique matches to avoid over-counting a single skill

@@ -3,13 +3,13 @@ from typing import Optional, Dict, Any
 
 def load_jobs_from_csv(filepath: str = "data/jobs/jobs.csv") -> Optional[pd.DataFrame]:
     """
-    Loads job data from a CSV file into a pandas DataFrame.
-
-    Args:
-        filepath: The path to the jobs CSV file.
-
+    Load job listings from a CSV file into a pandas DataFrame.
+    
+    Parameters:
+        filepath (str): Path to the jobs CSV file (default: "data/jobs/jobs.csv").
+    
     Returns:
-        A pandas DataFrame with the job listings, or None if an error occurs.
+        Optional[pd.DataFrame]: DataFrame with job listings on success, or None if the file cannot be read.
     """
     try:
         df = pd.read_csv(filepath)
@@ -24,13 +24,13 @@ def load_jobs_from_csv(filepath: str = "data/jobs/jobs.csv") -> Optional[pd.Data
 
 def load_master_resume(filepath: str = "data/resume_master.md") -> Optional[str]:
     """
-    Loads the master resume content from a markdown file.
-
-    Args:
-        filepath: The path to the master resume file.
-
+    Load the master resume Markdown file and return its contents as a UTF-8 string.
+    
+    Parameters:
+        filepath (str): Path to the Markdown file. Defaults to "data/resume_master.md".
+    
     Returns:
-        The content of the resume as a string, or None if an error occurs.
+        Optional[str]: The file contents as a string, or None if the file is not found or an error occurs while reading.
     """
     try:
         with open(filepath, 'r', encoding='utf-8') as f:

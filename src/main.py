@@ -4,7 +4,28 @@ import pandas as pd
 
 def run_pipeline():
     """
-    Main function to run the entire job application pipeline.
+    Orchestrate the end-to-end job-application pipeline: load data, normalize and score jobs,
+    generate tailored resume variants for top matches, update the CRM application log,
+    produce an HTML report, and email the report.
+    
+    Performs these high-level actions:
+    - Clears previous CRM logs.
+    - Loads jobs and a master resume; exits early if either is missing or empty.
+    - Normalizes and filters jobs using project settings; exits early if no jobs remain.
+    - Scores filtered jobs against the master resume and selects the top N (currently N=1).
+    - For each selected job: attempts to generate a resume variant (if an OpenAI client is available)
+      and records the outcome in the CRM with a status of "scored", "resume_generated", or "generation_failed".
+    - Builds a summary from CRM logs, generates an HTML report, and emails the report if produced.
+    
+    Side effects:
+    - Mutates CRM/application logs via crm.update_application_log and crm.clean_crm_logs.
+    - Reads/writes local files (CRM CSV and the generated HTML report).
+    - May send email through email_client.send_report_email.
+    - Calls external services (e.g., OpenAI) when available.
+    
+    Notes:
+    - The function uses early returns for missing initial data or when filtering yields no jobs.
+    - Exceptions for missing CRM or report files are handled internally (FileNotFoundError).
     """
     print("=========================================")
     print("🚀 Starting the AJOB4AGENT Pipeline")
