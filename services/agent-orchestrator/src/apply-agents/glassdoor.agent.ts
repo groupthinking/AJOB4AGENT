@@ -9,12 +9,12 @@ export class GlassdoorApplyAgent implements IApplyAgent {
         this.payload = payload;
     }
 
-    async apply(channel: Channel): Promise<void> {
+    async apply(_channel: Channel): Promise<void> {
         console.log(`[GlassdoorAgent] Starting application for ${this.payload.job_url}`);
         // Full browser lifecycle management will be implemented here
     }
 
-    async login(page: Page): Promise<void> {
+    async login(_page: Page): Promise<void> {
         console.log('[GlassdoorAgent] Logging in...');
         // Key Selector Differences:
         // - Glassdoor uses a login modal.
@@ -36,7 +36,7 @@ export class GlassdoorApplyAgent implements IApplyAgent {
         await applyButton.click();
     }
 
-    async fillApplication(page: Page): Promise<void> {
+    async fillApplication(_page: Page): Promise<void> {
         console.log('[GlassdoorAgent] Filling application form...');
         // Key Selector Differences:
         // - The modal container will have a unique selector, e.g., `div[data-test="application-modal"]`.
@@ -45,7 +45,7 @@ export class GlassdoorApplyAgent implements IApplyAgent {
         // - The logic must be robust enough to handle single-page and multi-page forms.
     }
 
-    async submitApplication(page: Page): Promise<void> {
+    async submitApplication(_page: Page): Promise<void> {
         console.log('[GlassdoorAgent] Submitting application...');
         // Key Selector Differences:
         // - Final submit button will have a selector like `button[data-test="submit-application"]`.

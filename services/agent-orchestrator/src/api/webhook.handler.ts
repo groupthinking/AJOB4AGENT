@@ -29,7 +29,7 @@ router.post('/stripe-webhook', express.raw({ type: 'application/json' }), async 
 
     // Handle the event
     switch (event.type) {
-        case 'checkout.session.completed':
+        case 'checkout.session.completed': {
             const session = event.data.object as Stripe.Checkout.Session;
             const customer = await stripe.customers.retrieve(session.customer as string) as Stripe.Customer;
             const userId = customer.metadata.userId;
@@ -41,6 +41,7 @@ router.post('/stripe-webhook', express.raw({ type: 'application/json' }), async 
             // and update the user's plan and credits in your database.
             await updateUserPlanAndCredits(userId, 'PRO'); // Hardcoded to PRO for this example
             break;
+        }
         
         // ... handle other event types (e.g., 'invoice.payment_failed')
         
