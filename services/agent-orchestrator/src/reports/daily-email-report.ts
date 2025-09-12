@@ -29,6 +29,7 @@ class DailyReportGenerator {
     // This is a mock implementation - in production, this would fetch from database
     const today = new Date().toISOString().split('T')[0];
     
+    // TODO: Replace this mock data with actual database queries before production deployment
     // Mock data - replace with actual database queries
     return {
       date: today,
