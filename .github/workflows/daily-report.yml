@@ -2,6 +2,9 @@
 name: Daily Job Engine
 
 on:
+  schedule:
+    - cron: "0 13 * * 1-5"   # 08:00 America/Chicago (UTC-5/6)
+    - cron: "45 22 * * 1-5"  # 17:45 America/Chicago (5:45 PM Central)
   workflow_dispatch: {}
 
 jobs:
