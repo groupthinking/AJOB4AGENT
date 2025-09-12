@@ -1,0 +1,41 @@
+name: Email Smoke Test
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create test HTML
+        run: |
+          mkdir -p reports
+          cat > reports/daily_report.html <<'HTML'
+          <!doctype html><html><body>
+          <h1>Email Smoke Test</h1>
+          <p>If you can read this, SMTP works.</p>
+          </body></html>
+          HTML
+
+      - name: Check required secrets
+        id: check_secrets
+        run: |
+          if [[ -n "${{ secrets.SMTP_HOST }}" && -n "${{ secrets.SMTP_USERNAME }}" && -n "${{ secrets.SMTP_PASSWORD }}" && -n "${{ secrets.SMTP_FROM }}" && -n "${{ secrets.SMTP_TO }}" ]]; then
+            echo "secrets_ready=true" >> $GITHUB_OUTPUT
+          else
+            echo "secrets_ready=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send test email
+        if: ${{ steps.check_secrets.outputs.secrets_ready == 'true' }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT || 587 }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Email Smoke Test"
+          to: ${{ secrets.SMTP_TO }}
+          from: ${{ secrets.SMTP_FROM }}
+          content_type: text/html
+          html_body: file://reports/daily_report.html

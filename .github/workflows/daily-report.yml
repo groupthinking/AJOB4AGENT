@@ -1,8 +1,16 @@
+
+name: Daily Job Engine
+
+on:
+  schedule:
+    - cron: "0 13 * * 1-5"   # 08:00 America/Chicago
+
 name: Daily Job Engine 
 
 on:
   schedule:
     - cron: "0 13 * * 1-5"   # 08:00 America/Chicago (UTC-5/6)
+
   workflow_dispatch: {}
 
 jobs:
@@ -16,7 +24,11 @@ jobs:
         with:
           python-version: "3.11"
 
+
+      - name: Install deps
+
       - name: Install deps (best effort)
+
         run: |
           python -m venv .venv
           . .venv/bin/activate
@@ -36,6 +48,8 @@ jobs:
             python scripts/generate_report.py
           else
             mkdir -p reports
+
+            echo "<html><body><h1>Daily Job Report</h1><p>No generator script found.</p></body></html>" > reports/daily_report.html
             cat > reports/daily_report.html <<'HTML'
             <!doctype html><html><body>
             <h1>Daily Job Report</h1>
@@ -50,9 +64,13 @@ jobs:
           name: daily-report
           path: reports/daily_report.html
 
+      - name: Email report
+        uses: dawidd6/action-send-mail@v3
+        continue-on-error: true
       - name: Email report (if SMTP secrets set)
         if: ${{ secrets.SMTP_HOST != '' && secrets.SMTP_USERNAME != '' && secrets.SMTP_PASSWORD != '' && secrets.SMTP_FROM != '' && secrets.SMTP_TO != '' }}
         uses: dawidd6/action-send-mail@v3
+ 
         with:
           server_address: ${{ secrets.SMTP_HOST }}
           server_port: ${{ secrets.SMTP_PORT || 587 }}
