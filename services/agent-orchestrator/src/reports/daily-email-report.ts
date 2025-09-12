@@ -167,7 +167,10 @@ class DailyReportGenerator {
 // Run the report generator when this file is executed directly
 if (require.main === module) {
   const generator = new DailyReportGenerator();
-  generator.generateAndSend().catch(console.error);
+  generator.generateAndSend().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 }
 
 export default DailyReportGenerator;
