@@ -37,5 +37,4 @@ jobs:
           subject: "Email Smoke Test"
           to: ${{ secrets.SMTP_TO }}
           from: ${{ secrets.SMTP_FROM }}
-          content_type: text/html
-          html_body: file://reports/daily_report.html
+          body: file://reports/daily_report.html
