@@ -13,9 +13,9 @@ Create these 6 secrets in your repository:
 | Secret Name | Value | Description |
 |-------------|-------|-------------|
 | `SMTP_HOST` | `smtp.gmail.com` | Gmail SMTP server |
-| `SMTP_USERNAME` | `your.email@gmail.com` | Your Gmail address |
+| `SMTP_USERNAME` | `h@haydengarvey.com` | Your Gmail address |
 | `SMTP_PASSWORD` | `wusvnhcjhjokvqml` | Your app password |
-| `SMTP_FROM` | `your.email@gmail.com` | Same as username |
+| `SMTP_FROM` | `h@haydengarvey.com` | Same as username |
 | `SMTP_TO` | `recipient@email.com` | Where to receive reports |
 | `SMTP_PORT` | `587` | SMTP port (optional) |
 
