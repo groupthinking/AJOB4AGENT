@@ -6,6 +6,8 @@ import winston from 'winston';
 import dotenv from 'dotenv';
 import stripeRoutes from './api/stripe.routes';
 import webhookHandler from './api/webhook.handler';
+import jobSearchRoutes from './api/job-search';
+import unifiedJobSearchRoutes from './api/unified-job-search';
 
 // Load environment variables
 dotenv.config();
@@ -114,6 +116,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // API routes
 app.use('/api', stripeRoutes);
+app.use('/api/jobs', jobSearchRoutes);
+app.use('/api/unified', unifiedJobSearchRoutes); // 10-platform unified search
 
 // TODO: Add other routes like '/process-scraped-job'
 app.post('/api/process-scraped-job', (req: Request, res: Response) => {
