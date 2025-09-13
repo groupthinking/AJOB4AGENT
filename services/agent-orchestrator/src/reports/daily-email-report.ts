@@ -26,23 +26,28 @@ class DailyReportGenerator {
   }
 
   private async getDailyData(): Promise<DailyReportData> {
-    // This is a mock implementation - in production, this would fetch from database
+    // Use deterministic mock data if USE_MOCK_DATA env var is set to 'true', otherwise fetch from database
     const today = new Date().toISOString().split('T')[0];
+    const useMockData = process.env.USE_MOCK_DATA === 'true';
     
-    // TODO: Replace this mock data with actual database queries before production deployment
-    // Mock data - replace with actual database queries
-    return {
-      date: today,
-      applicationsSubmitted: Math.floor(Math.random() * 10) + 1,
-      outreachSent: Math.floor(Math.random() * 15) + 5,
-      responsesReceived: Math.floor(Math.random() * 3),
-      newJobsFound: Math.floor(Math.random() * 25) + 10,
-      platformStats: {
-        linkedin: Math.floor(Math.random() * 8) + 2,
-        wellfound: Math.floor(Math.random() * 6) + 1,
-        glassdoor: Math.floor(Math.random() * 4) + 1
-      }
-    };
+    if (useMockData) {
+      // Deterministic mock data for development/testing
+      return {
+        date: today,
+        applicationsSubmitted: 7,
+        outreachSent: 12,
+        responsesReceived: 2,
+        newJobsFound: 18,
+        platformStats: {
+          linkedin: 5,
+          wellfound: 3,
+          glassdoor: 2
+        }
+      };
+    }
+    // TODO: Implement actual database queries for production use
+    // For now, throw an error to prevent accidental use in production
+    throw new Error('getDailyData: Real data fetching not implemented. Set USE_MOCK_DATA=true for mock data.');
   }
 
   private generateEmailHTML(data: DailyReportData): string {
