@@ -1,5 +1,9 @@
 import { Request, Response, Router } from 'express';
+import Stripe from 'stripe';
 import express from 'express';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 const router = Router();
 
@@ -10,25 +14,43 @@ async function updateUserPlanAndCredits(userId: string, newPlan: 'PRO' | 'ENTERP
     // SQL: UPDATE users SET plan = $1, application_credits = $2 WHERE id = $3
 }
 
-// Mock webhook handler for testing without Stripe
+
+// Stripe requires the raw body to construct the event
 router.post('/stripe-webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
+    const sig = req.headers['stripe-signature']!;
+    let event: Stripe.Event;
+
     try {
-        // Mock webhook processing
-        console.log('Mock webhook received:', req.body?.toString() || 'No body');
-        
-        // Simulate successful checkout session
-        const mockUserId = 'user_123';
-        console.log(`Mock payment was successful for user ${mockUserId}!`);
-        
-        // Mock plan upgrade
-        await updateUserPlanAndCredits(mockUserId, 'PRO');
-        
-        // Return a 200 response to acknowledge receipt of the event
-        res.json({ received: true, mock: true });
-    } catch (error) {
-        console.error('Mock webhook error:', error);
-        res.status(500).json({ error: 'Mock webhook processing failed' });
+        event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } catch (err) {
+        console.log(`Webhook signature verification failed.`);
+        return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : String(err)}`);
     }
+
+    // Handle the event
+    switch (event.type) {
+        case 'checkout.session.completed': {
+            const session = event.data.object as Stripe.Checkout.Session;
+            const customer = await stripe.customers.retrieve(session.customer as string) as Stripe.Customer;
+            const userId = customer.metadata.userId;
+
+            console.log(`Payment was successful for user ${userId}!`);
+            
+            // TODO: Fulfill the purchase.
+            // Check session.line_items to see which plan was purchased
+            // and update the user's plan and credits in your database.
+            await updateUserPlanAndCredits(userId, 'PRO'); // Hardcoded to PRO for this example
+            break;
+        }
+        
+        // ... handle other event types (e.g., 'invoice.payment_failed')
+        
+        default:
+            console.log(`Unhandled event type ${event.type}`);
+    }
+
+    // Return a 200 response to acknowledge receipt of the event
+    res.json({ received: true });
 });
 
 export default router;

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJOB4AGENT - Dashboard</title>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+    <!-- Pico.css for styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+
+    <style>
+        body { padding-top: 0; }
+        main { padding: 2rem; }
+        h1 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>AJOB4AGENT Dashboard</h1>
+            <p>A live view of your job application pipeline.</p>
+        </header>
+
+        <section>
+            <h2>Application Log</h2>
+            <div hx-get="/data/applications" hx-trigger="load, every 5s" id="applications-data">
+                <p><progress indeterminate></progress> Loading applications...</p>
+            </div>
+        </section>
+
+        <footer>
+            <small>Dashboard will auto-refresh every 5 seconds.</small>
+        </footer>
+    </main>
+</body>
+</html>

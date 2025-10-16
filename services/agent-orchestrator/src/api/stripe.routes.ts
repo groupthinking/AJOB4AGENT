@@ -1,58 +1,57 @@
 import { Request, Response, Router } from 'express';
+import Stripe from 'stripe';
 
-interface AuthedRequest extends Request {
-    userId?: string;
-    user?: {
-        email: string;
-    };
-}
+// This would be in a separate config file
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
 
 const router = Router();
 
 // MOCK DATABASE CALL - REPLACE WITH REAL IMPLEMENTATION
-async function updateUserStripeCustomerId(userId: string, customerId: string): Promise<void> {
+async function updateUserStripeCustomerId(userId: number, customerId: string): Promise<void> {
     console.log(`[DB] Associating user ${userId} with Stripe customer ${customerId}`);
     // SQL: UPDATE users SET stripe_customer_id = $1 WHERE id = $2
 }
 
-router.post('/create-checkout-session', async (req: AuthedRequest, res: Response) => {
+router.post('/create-checkout-session', async (req: Request, res: Response) => {
     // A real auth middleware must place userId on the request object first
-    const userId = req.userId;
+    const userId = (req as any).userId; 
     const { priceId } = req.body; // e.g., 'price_...' for the PRO plan
-
-    // Validate that user and user.email exist on the request object
-    const user = req.user;
-    if (!user || !user.email) {
-        return res.status(400).json({ error: 'Missing user email on request' });
-    }
 
     if (!userId || !priceId) {
         return res.status(400).json({ error: 'Missing userId or priceId' });
     }
 
     try {
-        // Mock Stripe customer creation
-        const customer = {
-            id: `cus_mock_${Date.now()}`,
-            email: user.email,
+        // Create a Stripe customer for the user if one doesn't exist
+        const customer = await stripe.customers.create({
+            email: (req as any).user.email, // Assuming user email is on the request
             metadata: {
-                userId: userId,
+                userId: userId, // Our internal user ID
             },
-        };
+        });
 
         // Save the customer ID to our database
         await updateUserStripeCustomerId(userId, customer.id);
 
-        // Mock session creation
-        const session = {
-            id: `cs_mock_${Date.now()}`,
-            url: `http://localhost:3001/dashboard?payment=success`
-        };
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            mode: 'subscription',
+            customer: customer.id,
+            line_items: [
+                {
+                    price: priceId,
+                    quantity: 1,
+                },
+            ],
+            // IMPORTANT: We pass our internal user ID here to link the transaction back
+            // client_reference_id: userId.toString(),
+            success_url: `http://localhost:3001/dashboard?payment=success`, // Your frontend success URL
+            cancel_url: `http://localhost:3001/dashboard?payment=cancelled`, // Your frontend cancellation URL
+        });
 
         res.json({ sessionId: session.id });
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        res.status(500).json({ error: errorMessage });
+    } catch (e) {
+        res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
     }
 });
 

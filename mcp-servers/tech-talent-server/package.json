@@ -1,0 +1,23 @@
+{
+  "name": "tech-talent-mcp-server",
+  "version": "1.0.0",
+  "description": "Unified tech talent MCP server for Hired/Vettery + Built In networks",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn src/index.ts"
+  },
+  "keywords": ["mcp", "hired", "vettery", "builtin", "tech-jobs"],
+  "dependencies": {
+    "@modelcontextprotocol/server": "^1.0.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}

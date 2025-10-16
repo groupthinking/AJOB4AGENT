@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJOB4AGENT - Daily Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        h1, h2 {
+            color: #1a1a1a;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 40px;
+        }
+        .code {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AJOB4AGENT Daily Report</h1>
+    <p><strong>Report generated on:</strong> {{ generation_date }}</p>
+
+    <h2>📈 Summary</h2>
+    <ul>
+        <li><strong>Total Jobs Processed:</strong> {{ summary.total_jobs }}</li>
+        <li><strong>Jobs Matching Criteria:</strong> {{ summary.filtered_jobs }}</li>
+        <li><strong>Top Scored Job:</strong> '{{ summary.top_job_title }}' at '{{ summary.top_job_company }}' (Score: {{ summary.top_job_score }})</li>
+        <li><strong>Resumes Generated:</strong> {{ summary.resumes_generated }}</li>
+    </ul>
+
+    <h2>✅ Processed Applications</h2>
+    {% if applications %}
+    <table>
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Title</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Resume Path</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>{{ app.company }}</td>
+                <td>{{ app.title }}</td>
+                <td>{{ app.score }}</td>
+                <td><span class="code">{{ app.status }}</span></td>
+                <td><span class="code">{{ app.resume_variant_path }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No applications were processed in this run.</p>
+    {% endif %}
+
+    <div class="footer">
+        <p>End of report.</p>
+    </div>
+
+</body>
+</html>

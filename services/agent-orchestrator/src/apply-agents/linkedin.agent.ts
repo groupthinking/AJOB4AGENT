@@ -1,9 +1,9 @@
 import { IApplyAgent, TailoredOutput } from './agent.interface';
 import { chromium, Browser, Page } from 'playwright';
-import { Channel } from 'amqplib';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { tmpdir } from 'os';
+import { Channel } from 'amqplib';
 
 export class LinkedInApplyAgent implements IApplyAgent {
     payload: TailoredOutput;
@@ -38,7 +38,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
         console.log(`[LinkedInAgent] Starting application for ${this.payload.job_url}`);
         try {
             await this.createTempResumeFile();
-            browser = await chromium.launch({ headless: false }); // headless: false for testing - watch the browser!
+            browser = await chromium.launch({ headless: true }); // headless: true for production
             const context = await browser.newContext();
             const page = await context.newPage();
             
@@ -50,8 +50,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
             await this.reportStatus(channel, 'success', 'Application submitted successfully via Easy Apply.');
         } catch (error) {
             console.error(`[LinkedInAgent] FAILED to apply for ${this.payload.job_id}:`, error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            await this.reportStatus(channel, 'failure', errorMessage);
+            await this.reportStatus(channel, 'failure', error instanceof Error ? error.message : String(error));
         } finally {
             if (browser) {
                 await browser.close();
@@ -61,6 +60,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
     }
 
     async login(page: Page): Promise<void> {
+        // ... (implementation from previous step)
         console.log('[LinkedInAgent] Navigating to login page...');
         await page.goto('https://www.linkedin.com/login');
         console.log('[LinkedInAgent] Entering credentials...');
@@ -68,66 +68,17 @@ export class LinkedInApplyAgent implements IApplyAgent {
         await page.fill('#password', process.env.LINKEDIN_PASSWORD!);
         await page.click('button[type="submit"]');
         console.log('[LinkedInAgent] Waiting for successful login...');
-        
-        // Wait for any of these indicators that login was successful
-        try {
-            await page.waitForFunction(
-                () => {
-                    return window.location.href.includes('/feed/') || 
-                           window.location.href.includes('/in/') ||
-                           document.querySelector('[data-test-id="nav-top-home"]') ||
-                           document.querySelector('div.feed-identity-module') ||
-                           document.querySelector('.global-nav') ||
-                           !window.location.href.includes('/login');
-                },
-                { timeout: 30000 }
-            );
-            console.log('[LinkedInAgent] Login successful - detected LinkedIn homepage.');
-        } catch (error) {
-            console.log('[LinkedInAgent] Login may have security check - waiting 10 seconds for manual intervention...');
-            await page.waitForTimeout(10000);
-        }
+        await page.waitForSelector('div.feed-identity-module', { timeout: 60000 });
+        console.log('[LinkedInAgent] Login successful.');
     }
 
     async navigateToJob(page: Page): Promise<void> {
+        // ... (implementation from previous step)
         console.log(`[LinkedInAgent] Navigating to job: ${this.payload.job_url}`);
         await page.goto(this.payload.job_url);
-        console.log('[LinkedInAgent] Job page loaded. Current URL:', page.url());
-        
-        // Wait for page to load
-        await page.waitForTimeout(3000);
-        
-        // Debug: Check what buttons are available
-        const allButtons = await page.locator('button').allTextContents();
-        console.log('[LinkedInAgent] Available buttons on page:', allButtons);
-        
-        // Try different variations of the Easy Apply button
-        console.log('[LinkedInAgent] Looking for Easy Apply button...');
-        const easyApplySelectors = [
-            'button:has-text("Easy Apply")',
-            'button[aria-label*="Easy Apply"]',
-            'button:has-text("Apply")',
-            '.jobs-apply-button',
-            '.jobs-s-apply'
-        ];
-        
-        let easyApplyButton = null;
-        for (const selector of easyApplySelectors) {
-            try {
-                easyApplyButton = page.locator(selector).first();
-                if (await easyApplyButton.isVisible({ timeout: 5000 })) {
-                    console.log(`[LinkedInAgent] Found apply button with selector: ${selector}`);
-                    break;
-                }
-            } catch (e) {
-                console.log(`[LinkedInAgent] Selector ${selector} not found`);
-            }
-        }
-        
-        if (!easyApplyButton) {
-            throw new Error('Could not find Easy Apply button on job page');
-        }
-        
+        console.log('[LinkedInAgent] Waiting for Easy Apply button...');
+        const easyApplyButton = page.locator('button:has-text("Easy Apply")').first();
+        await easyApplyButton.waitFor({ state: 'visible', timeout: 30000 });
         await easyApplyButton.click();
         console.log('[LinkedInAgent] Easy Apply flow initiated.');
     }
@@ -154,7 +105,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
 
             // Handle Cover Letter
             const coverLetterTextarea = modal.locator('textarea[aria-label="Cover letter"]');
-             if (await coverLetterTextarea.isVisible()) {
+            if (await coverLetterTextarea.isVisible()) {
                 console.log('[LinkedInAgent] Found cover letter field. Pasting content...');
                 await coverLetterTextarea.fill(this.payload.cover_letter);
             }
@@ -164,7 +115,7 @@ export class LinkedInApplyAgent implements IApplyAgent {
                 console.log('[LinkedInAgent] Reached final submission step.');
                 break;
             }
-             if (await reviewButton.isVisible()) {
+            if (await reviewButton.isVisible()) {
                 console.log('[LinkedInAgent] Reached review step. Clicking to proceed to final submission.');
                 await reviewButton.click();
                 await page.waitForTimeout(2000); // Wait for final page to load
@@ -199,6 +150,5 @@ export class LinkedInApplyAgent implements IApplyAgent {
     async reportStatus(channel: Channel, status: 'success' | 'failure', details: string): Promise<void> {
         // ... (implementation from previous step)
         console.log(`[LinkedInAgent] STATUS: ${status} | JOB: ${this.payload.job_id} | DETAILS: ${details}`);
-        // TODO: Publish message to channel for real implementation
     }
 }

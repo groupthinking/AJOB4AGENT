@@ -1,0 +1,30 @@
+name: Email Smoke Test
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create test HTML
+        run: |
+          mkdir -p reports
+          cat > reports/daily_report.html <<'HTML'
+          <!doctype html><html><body>
+          <h1>Email Smoke Test</h1>
+          <p>If you can read this, SMTP works.</p>
+          </body></html>
+          HTML
+
+      - name: Send email
+        uses: dawidd6/action-send-mail@v6
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT || 587 }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Email Smoke Test"
+          to: ${{ secrets.SMTP_TO }}
+          from: ${{ secrets.SMTP_FROM }}
+          html_body: file://reports/daily_report.html

@@ -1,16 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
+// In a real application, you would query the PostgreSQL database.
+// We'll use a mock function for this example.
+// You would replace this with a proper DB client like 'pg' or an ORM like 'Sequelize'.
 
 // Mock User Type - In reality, this would match your DB schema.
 interface User {
   id: number;
   plan: 'PILOT' | 'PRO' | 'ENTERPRISE';
   application_credits: number;
-}
-
-// Extended request interface for authenticated requests
-interface AuthRequest extends Request {
-    userId?: number;
-    user?: User;
 }
 
 // MOCK DATABASE CALL - REPLACE WITH REAL IMPLEMENTATION
@@ -25,10 +22,10 @@ async function findUserById(userId: number): Promise<User | null> {
     return mockUsers[userId] || null;
 }
 
-export const subscriptionCheck = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const subscriptionCheck = async (req: Request, res: Response, next: NextFunction) => {
     // CRITICAL PREREQUISITE: A real authentication middleware must run before this
     // to identify the user and attach their ID to the request object.
-    const userId = req.userId; 
+    const userId = (req as any).userId; 
     if (!userId) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized. No user identified.' });
     }
@@ -40,7 +37,7 @@ export const subscriptionCheck = async (req: AuthRequest, res: Response, next: N
     }
 
     // Attach user to request for downstream use
-    req.user = user;
+    (req as any).user = user;
 
     if (user.plan === 'ENTERPRISE' || user.plan === 'PRO') {
         // PRO and ENTERPRISE have effectively unlimited applications for this check.

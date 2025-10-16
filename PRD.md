@@ -1,4 +1,4 @@
-Autonomous Job Application & Outreach Agent
+# Product Requirements Document: Autonomous Job Application & Outreach Agent
 
 ## Objective
 Automate end-to-end job search, application, resume tailoring, and recruiter outreach across LinkedIn, Glassdoor, Wellfound, and future platforms using a modular, LLM-driven agentic system.
