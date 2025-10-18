@@ -14,7 +14,7 @@ This URL only works in local development and fails when deployed to Vercel becau
 2. The monitoring service at port 8001 is not available in the browser context
 
 ## Solution
-Updated the API URL to use the environment variable `NEXT_PUBLIC_API_URL`:
+Updated the API URL to use the environment variable `NEXT_PUBLIC_API_URL` in commit 75df9a1:
 ```typescript
 const API_URL = process.env.NEXT_PUBLIC_API_URL 
   ? `${process.env.NEXT_PUBLIC_API_URL}/api/logs`
@@ -39,4 +39,18 @@ To set the API URL in Vercel:
 2. Add environment variable: `NEXT_PUBLIC_API_URL` with the backend API URL
 3. Redeploy the application
 
-For local development, the default fallback URL `/api/logs` will be used, which will be proxied through Next.js rewrites configuration.
+For local development, the default fallback URL `/api/logs` will be used, which will be proxied through Next.js rewrites configuration in `services/dashboard-service/next.config.js`:
+
+```javascript
+async rewrites() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  return [
+    {
+      source: '/api/:path*',
+      destination: `${apiUrl}/api/:path*`,
+    },
+  ]
+}
+```
+
+This allows the frontend to make API calls to `/api/*` which are automatically proxied to the backend service.
