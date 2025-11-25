@@ -7,6 +7,7 @@ import {
   UserProfile,
   FormFillLogger,
 } from '../types';
+import { createDefaultLogger } from '../utils/DefaultLogger';
 
 /**
  * Patterns for matching form field labels to semantic types
@@ -167,7 +168,7 @@ export class FieldMappingService {
 
   constructor(llmServiceUrl?: string, logger?: FormFillLogger) {
     this.useLocalFallback = !llmServiceUrl;
-    this.logger = logger || console;
+    this.logger = logger || createDefaultLogger('FieldMappingService');
 
     if (llmServiceUrl) {
       this.llmClient = axios.create({

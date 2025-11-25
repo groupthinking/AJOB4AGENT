@@ -38,8 +38,13 @@ export class LinkedInAdapter extends BasePlatformAdapter {
    * Check if currently on LinkedIn
    */
   async isOnPlatform(page: Page): Promise<boolean> {
-    const url = page.url();
-    return url.includes('linkedin.com');
+    try {
+      const url = new URL(page.url());
+      // Check if hostname ends with linkedin.com (covers www.linkedin.com, linkedin.com, etc.)
+      return url.hostname === 'linkedin.com' || url.hostname.endsWith('.linkedin.com');
+    } catch {
+      return false;
+    }
   }
 
   /**

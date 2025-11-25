@@ -3,4 +3,5 @@ export { FieldMappingService } from './field-mapping/FieldMappingService';
 export { LinkedInAdapter } from './adapters/LinkedInAdapter';
 export { GlassdoorAdapter } from './adapters/GlassdoorAdapter';
 export { BasePlatformAdapter } from './adapters/BasePlatformAdapter';
+export { DefaultLogger, createDefaultLogger } from './utils/DefaultLogger';
 export * from './types';

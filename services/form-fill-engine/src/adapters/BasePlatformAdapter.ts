@@ -6,6 +6,7 @@ import {
   FormFillLogger,
 } from '../types';
 import { FieldMappingService } from '../field-mapping/FieldMappingService';
+import { createDefaultLogger } from '../utils/DefaultLogger';
 
 /**
  * Base implementation for platform adapters with common functionality
@@ -17,7 +18,7 @@ export abstract class BasePlatformAdapter implements IPlatformAdapter {
 
   constructor(fieldMapper: FieldMappingService, logger?: FormFillLogger) {
     this.fieldMapper = fieldMapper;
-    this.logger = logger || console;
+    this.logger = logger || createDefaultLogger('BasePlatformAdapter');
   }
 
   abstract isOnPlatform(page: Page): Promise<boolean>;

@@ -16,6 +16,7 @@ import {
 import { FieldMappingService } from './field-mapping/FieldMappingService';
 import { LinkedInAdapter } from './adapters/LinkedInAdapter';
 import { GlassdoorAdapter } from './adapters/GlassdoorAdapter';
+import { createDefaultLogger } from './utils/DefaultLogger';
 
 /**
  * Default configuration for the form fill engine
@@ -43,7 +44,7 @@ export class FormAutoFillEngine {
 
   constructor(config: Partial<FormFillConfig> = {}, logger?: FormFillLogger) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    this.logger = logger || console;
+    this.logger = logger || createDefaultLogger('FormAutoFillEngine');
     this.fieldMapper = new FieldMappingService(this.config.llmServiceUrl, this.logger);
     this.adapters = new Map();
 

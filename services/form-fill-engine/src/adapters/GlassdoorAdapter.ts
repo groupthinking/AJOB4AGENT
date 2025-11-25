@@ -32,8 +32,13 @@ export class GlassdoorAdapter extends BasePlatformAdapter {
    * Check if currently on Glassdoor
    */
   async isOnPlatform(page: Page): Promise<boolean> {
-    const url = page.url();
-    return url.includes('glassdoor.com');
+    try {
+      const url = new URL(page.url());
+      // Check if hostname ends with glassdoor.com (covers www.glassdoor.com, glassdoor.com, etc.)
+      return url.hostname === 'glassdoor.com' || url.hostname.endsWith('.glassdoor.com');
+    } catch {
+      return false;
+    }
   }
 
   /**
