@@ -152,32 +152,18 @@ export class GlassdoorAdapter {
 
   private async searchPublicJobs(params: JobSearchParams): Promise<JobResult[]> {
     try {
-      // Build Glassdoor search URL
-      const searchQuery = encodeURIComponent(params.searchTerm);
-      const location = encodeURIComponent(params.location || 'United States');
-
       // Construct job search URL
       const searchUrl = `${this.baseUrl}/jobs.htm`;
-      const searchParams = {
-        sc: {
-          keyword: params.searchTerm,
-          locT: 'N', // Location type: N = national
-          locId: '1', // US location ID
-          locKeyword: params.location || 'United States'
-        },
-        fromAge: this.mapDatePosted(params.datePosted),
-        seniorityType: this.mapExperienceLevel(params.experienceLevel),
-        remoteWorkType: params.remoteOnly ? '1' : undefined, // 1 = Remote only
-        minSalary: params.salaryMin
-      };
 
-      // Make request with custom URL params
+      // Make request with URL params
       const response = await this.client.get(searchUrl, {
         params: {
           keyword: params.searchTerm,
-          locT: 'C', // City
-          locKeyword: params.location || '',
-          fromAge: this.mapDatePosted(params.datePosted)
+          locT: params.location ? 'C' : 'N', // C = City, N = National
+          locKeyword: params.location || 'United States',
+          fromAge: this.mapDatePosted(params.datePosted),
+          seniorityType: this.mapExperienceLevel(params.experienceLevel),
+          remoteWorkType: params.remoteOnly ? '1' : undefined
         }
       });
 
@@ -198,7 +184,7 @@ export class GlassdoorAdapter {
       location: params.location || 'United States',
       fromAge: this.mapDatePosted(params.datePosted),
       seniorityType: this.mapExperienceLevel(params.experienceLevel),
-      remoteWorkType: params.remoteOnly ? 'REMOTE' : undefined,
+      remoteWorkType: params.remoteOnly ? '1' : undefined, // 1 = Remote only
       minSalary: params.salaryMin,
       pageSize: 50,
       page: 1
@@ -407,8 +393,20 @@ export class GlassdoorAdapter {
 
   private extractDescription(description: string): string {
     // Clean and truncate description
-    return description
-      .replace(/<[^>]*>/g, '') // Remove HTML
+    // Use iterative replacement to handle nested/malformed tags
+    let cleaned = description;
+    let previous = '';
+    
+    // Iteratively remove HTML tags until no more changes occur
+    while (cleaned !== previous) {
+      previous = cleaned;
+      cleaned = cleaned.replace(/<[^>]*>/g, '');
+    }
+    
+    // Also remove any remaining angle brackets that might indicate incomplete tags
+    cleaned = cleaned.replace(/[<>]/g, '');
+    
+    return cleaned
       .replace(/\n\s*\n/g, '\n') // Remove extra line breaks
       .trim()
       .substring(0, 500);
