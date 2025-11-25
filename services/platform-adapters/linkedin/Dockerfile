@@ -41,10 +41,6 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy base types
-COPY --from=builder /app/../base ./base
-COPY --from=builder /app/../types ./types
-
 # Install Playwright browsers (Chromium only for smaller image)
 RUN npx playwright install chromium --with-deps
 

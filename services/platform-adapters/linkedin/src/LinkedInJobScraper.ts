@@ -192,7 +192,7 @@ export class LinkedInJobScraper extends BaseJobScraper {
         if (!job.id) {
           job.id = `linkedin-${Date.now()}-${Math.random()
             .toString(36)
-            .substr(2, 9)}`;
+            .substring(2, 11)}`;
         }
 
         job.scrapedAt = scrapedAt;
