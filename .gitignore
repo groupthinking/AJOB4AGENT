@@ -178,6 +178,12 @@ coverage/
 .nyc_output
 .coverage
 
+# Playwright
+playwright-report/
+playwright/.cache
+test-results/
+blob-report/
+
 # TypeScript
 *.tsbuildinfo
 
