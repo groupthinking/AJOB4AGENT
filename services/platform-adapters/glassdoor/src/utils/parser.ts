@@ -250,7 +250,7 @@ export function parseSalaryEstimate(salaryStr: string): { min: number; max: numb
     return {
       min: value,
       max: value,
-      currency: 'USD'
+      currency  // Use detected currency from earlier
     };
   }
 
