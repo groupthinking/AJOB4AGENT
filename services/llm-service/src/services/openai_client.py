@@ -143,7 +143,7 @@ class OpenAIClient:
             model: Model override
             max_tokens: Max tokens override
             temperature: Temperature override
-            json_response: Whether to request JSON response format
+            json_response: Whether to request JSON response format (requires gpt-4-1106-preview or later)
             
         Returns:
             Tuple of (response_content, tokens_used)
@@ -153,6 +153,8 @@ class OpenAIClient:
             {"role": "user", "content": user_prompt},
         ]
         
+        # response_format with json_object is supported in OpenAI API v1.1+
+        # and requires models like gpt-4-1106-preview, gpt-4-turbo, or gpt-3.5-turbo-1106
         response_format = {"type": "json_object"} if json_response else None
         
         return await self._make_request_with_retry(
