@@ -127,9 +127,24 @@ export interface ScraperConfig {
 }
 
 /**
- * Platform adapter interface for extensibility
+ * Base search parameters that all platform adapters should support
  */
-export interface PlatformAdapter {
+export interface BaseSearchParams {
+  /** Job title/keywords to search for */
+  searchTerm: string;
+  /** Location filter */
+  location?: string;
+  /** Number of results */
+  limit?: number;
+  /** Pagination offset */
+  offset?: number;
+}
+
+/**
+ * Platform adapter interface for extensibility
+ * Generic interface allowing each platform to define its own search parameters
+ */
+export interface PlatformAdapter<TParams extends BaseSearchParams = LinkedInSearchParams> {
   /** Platform name identifier */
   readonly platform: string;
   
@@ -137,7 +152,7 @@ export interface PlatformAdapter {
   initialize(): Promise<void>;
   
   /** Search for jobs */
-  searchJobs(params: LinkedInSearchParams): Promise<JobSearchResponse>;
+  searchJobs(params: TParams): Promise<JobSearchResponse>;
   
   /** Cleanup resources */
   shutdown(): Promise<void>;

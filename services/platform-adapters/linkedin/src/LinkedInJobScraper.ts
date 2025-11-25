@@ -16,13 +16,18 @@ import {
   LinkedInJobMetadata
 } from './types';
 
-/** Default scraper configuration */
+/**
+ * Default scraper configuration
+ * Note: The userAgent should be updated periodically to match current browser versions
+ * to avoid detection. Consider using environment variables for production.
+ */
 const DEFAULT_CONFIG: Required<ScraperConfig> = {
   headless: true,
   timeout: 30000,
   minDelay: 2000,
   maxDelay: 5000,
   maxRequestsPerMinute: 20,
+  // Default user agent - update regularly or configure via ScraperConfig.userAgent
   userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   proxyUrl: '',
   debug: false
@@ -54,7 +59,7 @@ const DEFAULT_CONFIG: Required<ScraperConfig> = {
  * await scraper.shutdown();
  * ```
  */
-export class LinkedInJobScraper implements PlatformAdapter {
+export class LinkedInJobScraper implements PlatformAdapter<LinkedInSearchParams> {
   public readonly platform = 'linkedin';
   
   private config: Required<ScraperConfig>;
@@ -277,7 +282,7 @@ export class LinkedInJobScraper implements PlatformAdapter {
 
       for (const element of jobsToProcess) {
         try {
-          const job = await this.extractJobFromElement(element, page);
+          const job = await this.extractJobFromElement(element);
           if (job) {
             jobs.push(job);
           }
@@ -300,8 +305,7 @@ export class LinkedInJobScraper implements PlatformAdapter {
    * Extract job details from a single job card element
    */
   private async extractJobFromElement(
-    element: Awaited<ReturnType<Page['$']>>,
-    _page: Page
+    element: Awaited<ReturnType<Page['$']>>
   ): Promise<JobResult | null> {
     if (!element) return null;
 
@@ -309,7 +313,7 @@ export class LinkedInJobScraper implements PlatformAdapter {
       // Extract job ID
       const jobId = await element.getAttribute('data-job-id') || 
                     await element.$eval('[data-job-id]', el => el.getAttribute('data-job-id')).catch(() => null) ||
-                    `linkedin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                    `linkedin-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
       // Extract title
       const title = await element.$eval(
