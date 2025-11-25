@@ -9,6 +9,7 @@ import webhookHandler from './api/webhook.handler';
 import jobSearchRoutes from './api/job-search';
 import unifiedJobSearchRoutes from './api/unified-job-search';
 import workingJobSearchRoutes from './api/working-job-search';
+import authRoutes from './api/auth.routes';
 
 // Load environment variables
 dotenv.config();
@@ -116,6 +117,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // API routes
+app.use('/api/auth', authRoutes);
 app.use('/api', stripeRoutes);
 app.use('/api/jobs', jobSearchRoutes);
 app.use('/api/unified', unifiedJobSearchRoutes); // 10-platform unified search
