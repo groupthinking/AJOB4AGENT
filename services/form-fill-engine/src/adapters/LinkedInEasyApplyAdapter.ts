@@ -42,8 +42,18 @@ export class LinkedInEasyApplyAdapter extends BaseFormAdapter {
    * Check if URL is a LinkedIn job page
    */
   isApplyPage(url: string): boolean {
-    return url.includes('linkedin.com/jobs/') ||
-           url.includes('linkedin.com/job/');
+    try {
+      const parsedUrl = new URL(url);
+      const hostname = parsedUrl.hostname.toLowerCase();
+      const pathname = parsedUrl.pathname.toLowerCase();
+      // Check that hostname is linkedin.com or www.linkedin.com
+      const isLinkedIn = hostname === 'linkedin.com' || hostname === 'www.linkedin.com';
+      // Check that path starts with /jobs/ or /job/
+      const isJobPage = pathname.startsWith('/jobs/') || pathname.startsWith('/job/');
+      return isLinkedIn && isJobPage;
+    } catch {
+      return false;
+    }
   }
 
   /**

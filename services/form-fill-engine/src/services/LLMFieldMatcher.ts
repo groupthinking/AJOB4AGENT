@@ -259,7 +259,7 @@ export class LLMFieldMatcher {
       profilePath: '',
       value: '',
       confidence: 0,
-      source: 'llm'
+      source: 'fallback'
     };
   }
 

@@ -42,8 +42,18 @@ export class GlassdoorApplyAdapter extends BaseFormAdapter {
    * Check if URL is a Glassdoor job page
    */
   isApplyPage(url: string): boolean {
-    return url.includes('glassdoor.com/job-listing/') ||
-           url.includes('glassdoor.com/Jobs/');
+    try {
+      const parsedUrl = new URL(url);
+      const hostname = parsedUrl.hostname.toLowerCase();
+      const pathname = parsedUrl.pathname.toLowerCase();
+      // Check that hostname ends with glassdoor.com (www.glassdoor.com, glassdoor.com)
+      const isGlassdoor = hostname === 'glassdoor.com' || hostname === 'www.glassdoor.com';
+      // Check for job listing or jobs paths
+      const isJobPage = pathname.startsWith('/job-listing/') || pathname.startsWith('/jobs/');
+      return isGlassdoor && isJobPage;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -385,7 +395,16 @@ export class GlassdoorApplyAdapter extends BaseFormAdapter {
   async isExternalApplication(page: Page): Promise<boolean> {
     // Check if clicking apply redirects to an external site
     const currentUrl = page.url();
-    return !currentUrl.includes('glassdoor.com');
+    try {
+      const url = new URL(currentUrl);
+      const hostname = url.hostname.toLowerCase();
+      // Check if the hostname is exactly glassdoor.com or is a subdomain (ends with .glassdoor.com)
+      const isGlassdoor = hostname === 'glassdoor.com' || hostname.endsWith('.glassdoor.com');
+      return !isGlassdoor;
+    } catch {
+      // If URL parsing fails, assume external
+      return true;
+    }
   }
 
   /**

@@ -169,7 +169,7 @@ describe('FormAutoFillEngine', () => {
     it('should detect Glassdoor URLs', () => {
       const glassdoorUrls = [
         'https://www.glassdoor.com/job-listing/software-engineer.htm?jl=123456',
-        'https://glassdoor.com/Jobs/company-jobs'
+        'https://glassdoor.com/jobs/company-jobs'
       ];
 
       glassdoorUrls.forEach(url => {
@@ -468,7 +468,7 @@ describe('GlassdoorApplyAdapter', () => {
   describe('isApplyPage', () => {
     it('should return true for Glassdoor job URLs', () => {
       expect(adapter.isApplyPage('https://www.glassdoor.com/job-listing/engineer.htm?jl=123')).toBe(true);
-      expect(adapter.isApplyPage('https://glassdoor.com/Jobs/company-jobs')).toBe(true);
+      expect(adapter.isApplyPage('https://glassdoor.com/jobs/company-jobs')).toBe(true);
     });
 
     it('should return false for non-Glassdoor URLs', () => {
