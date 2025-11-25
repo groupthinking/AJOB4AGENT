@@ -21,6 +21,7 @@ export interface JobResult {
   datePosted: string;
   experienceLevel?: string;
   remote?: boolean;
+  metadata?: Record<string, unknown>;
 }
 
 export interface JobSearchResponse {

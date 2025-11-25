@@ -5,6 +5,7 @@ import { CoresignalAdapter } from './coresignal-adapter';
 import { YCombinatorAdapter } from './ycombinator-adapter';
 import { WellfoundEnhancedAdapter } from './wellfound-enhanced-adapter';
 import { TechTalentAdapter } from './tech-talent-adapter';
+import { GlassdoorAdapter } from './glassdoor-adapter';
 import { JobSearchParams, JobSearchResponse } from '../types/job-search';
 
 export class PlatformManager {
@@ -15,6 +16,7 @@ export class PlatformManager {
   private ycombinatorAdapter: YCombinatorAdapter;
   private wellfoundAdapter: WellfoundEnhancedAdapter;
   private techTalentAdapter: TechTalentAdapter;
+  private glassdoorAdapter: GlassdoorAdapter;
   
   private supportedPlatforms: string[] = [
     // JobSpy MCP platforms (4) - Tier 1
@@ -22,7 +24,9 @@ export class PlatformManager {
     // Enterprise API platforms (3) - Tier 2
     'greenhouse', 'google-talent', 'coresignal',
     // Custom MCP platforms (3) - Tier 3 - COMPLETE!
-    'ycombinator', 'wellfound', 'tech-talent-unified'
+    'ycombinator', 'wellfound', 'tech-talent-unified',
+    // Dedicated adapters - Tier 4
+    'glassdoor-direct'
   ];
 
   constructor() {
@@ -41,6 +45,9 @@ export class PlatformManager {
     this.ycombinatorAdapter = new YCombinatorAdapter();
     this.wellfoundAdapter = new WellfoundEnhancedAdapter(process.env.WELLFOUND_ACCESS_TOKEN);
     this.techTalentAdapter = new TechTalentAdapter(); // Hired/Vettery + Built In
+    
+    // Tier 4: Dedicated Adapters
+    this.glassdoorAdapter = new GlassdoorAdapter(process.env.GLASSDOOR_ACCESS_TOKEN);
   }
 
   async initialize(): Promise<void> {
@@ -119,6 +126,12 @@ export class PlatformManager {
       }
     }
 
+    // Phase 4: Dedicated adapters (Glassdoor direct)
+    if (params.platforms.includes('glassdoor-direct')) {
+      const platformParams = { ...params, platforms: ['glassdoor-direct'] };
+      searchPromises.push(this.glassdoorAdapter.searchJobs(platformParams));
+    }
+
     // Execute all searches in parallel (Anthropic orchestrator-worker pattern)
     try {
       const allResults = await Promise.allSettled(searchPromises);
@@ -178,6 +191,10 @@ export class PlatformManager {
       case 'tech-talent-unified':
         return await this.techTalentAdapter.searchJobs(platformParams);
       
+      // Dedicated adapters
+      case 'glassdoor-direct':
+        return await this.glassdoorAdapter.searchJobs(platformParams);
+      
       default:
         throw new Error(`Platform ${platform} adapter not configured`);
     }
@@ -210,7 +227,8 @@ export class PlatformManager {
       tiers: {
         'JobSpy MCP': 4,
         'Enterprise APIs': 3,
-        'Custom MCP': 3
+        'Custom MCP': 3,
+        'Dedicated Adapters': 1
       }
     };
   }
