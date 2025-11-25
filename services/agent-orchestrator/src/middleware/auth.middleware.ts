@@ -3,7 +3,12 @@ import jwt from 'jsonwebtoken';
 import { userStore } from '../db/user-store';
 import { JwtPayload, User } from '../types/auth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+// Validate JWT_SECRET is set in production
+const JWT_SECRET_ENV = process.env.JWT_SECRET;
+if (!JWT_SECRET_ENV && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET must be set in production environment');
+}
+const JWT_SECRET = JWT_SECRET_ENV || 'dev-secret-key-do-not-use-in-production';
 
 // Extended Request interface with user data
 export interface AuthenticatedRequest extends Request {

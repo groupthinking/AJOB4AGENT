@@ -5,7 +5,12 @@ import { CreateUserInput, LoginInput, OAuthInput, JwtPayload, User } from '../ty
 
 const router = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+// Validate JWT_SECRET is set in production
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET must be set in production environment');
+}
+const SECRET = JWT_SECRET || 'dev-secret-key-do-not-use-in-production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 // Helper to create JWT token
@@ -16,7 +21,7 @@ function createToken(user: User): string {
     role: user.role,
     plan: user.plan,
   };
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 // Helper to sanitize user (remove sensitive fields)
@@ -196,9 +201,11 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
     const resetToken = await userStore.createPasswordResetToken(user.id);
 
     // In production, send email with reset link
-    // For now, log the token (NEVER do this in production)
-    console.log(`🔑 Password reset token for ${email}: ${resetToken}`);
-    console.log(`   Reset link: ${process.env.APP_URL || 'http://localhost:3001'}/reset-password?token=${resetToken}`);
+    // Only log in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔑 Password reset token for ${email}: ${resetToken}`);
+      console.log(`   Reset link: ${process.env.APP_URL || 'http://localhost:3001'}/reset-password?token=${resetToken}`);
+    }
 
     return res.json({
       success: true,
@@ -283,7 +290,7 @@ router.get('/me', async (req: Request, res: Response) => {
     const token = authHeader.substring(7);
     
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+      const decoded = jwt.verify(token, SECRET) as JwtPayload;
       const user = await userStore.findById(decoded.userId);
       
       if (!user) {
@@ -325,7 +332,7 @@ router.post('/verify-token', async (req: Request, res: Response) => {
     }
 
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+      const decoded = jwt.verify(token, SECRET) as JwtPayload;
       const user = await userStore.findById(decoded.userId);
       
       if (!user) {
