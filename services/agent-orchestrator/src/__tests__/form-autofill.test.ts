@@ -1,4 +1,4 @@
-import { FormFieldDetector, FormFieldType } from '../form-autofill/field-detector';
+import { FormFieldDetector } from '../form-autofill/field-detector';
 import {
   UserProfile,
   validateProfile,

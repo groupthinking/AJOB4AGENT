@@ -1,4 +1,4 @@
-import { Page, Locator } from 'playwright';
+import { Page } from 'playwright';
 import { UserProfile } from './user-profile.interface';
 import { FormFieldDetector, DetectedField, FormFieldType } from './field-detector';
 
