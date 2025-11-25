@@ -36,6 +36,14 @@ build/
 .next/
 */.next/
 
+# TypeScript build artifacts
+*.js.map
+*.d.ts.map
+# Exclude .d.ts and .js files in platform-adapters (source is .ts)
+services/platform-adapters/**/*.js
+services/platform-adapters/**/*.d.ts
+!services/platform-adapters/**/jest.config.js
+
 # Runtime data
 pids
 *.pid
