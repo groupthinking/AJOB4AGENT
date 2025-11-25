@@ -31,8 +31,9 @@ COPY --from=builder /root/.local /home/appuser/.local
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Copy application code
+# Copy application code - both legacy app/ and new src/ structure
 COPY ./app ./app
+COPY ./src ./src
 
 # Change ownership to appuser
 RUN chown -R appuser:appuser /usr/src/app
@@ -43,6 +44,9 @@ USER appuser
 # Add local bin to PATH
 ENV PATH=/home/appuser/.local/bin:$PATH
 
+# Set Python path to include src directory
+ENV PYTHONPATH=/usr/src/app
+
 # Expose port
 EXPOSE 8000
 
@@ -50,5 +54,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
 
-# Run the FastAPI application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Run the FastAPI application (using new src structure)
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
