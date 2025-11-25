@@ -151,6 +151,66 @@ Content-Type: application/json
 }
 ```
 
+### Resume Tailor (OpenAI-Powered)
+```http
+POST /resume/tailor
+Content-Type: application/json
+
+{
+  "resume": "Your complete resume content here...",
+  "job_desc": "The job description to tailor the resume for..."
+}
+```
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| resume | string | Yes | The original resume content (min 10 chars) |
+| job_desc | string | Yes | The job description to tailor for (min 10 chars) |
+
+**Response:**
+```json
+{
+  "status": "success",
+  "role_fit": "Strong match for the position based on 5+ years of relevant experience...",
+  "experience_justification": "- Python/FastAPI expertise matches requirements\n- Cloud migration experience aligns with AWS needs\n- Team leadership experience",
+  "summary": "Results-driven senior software engineer with extensive backend development experience...",
+  "tailored_resume": "Complete tailored resume content optimized for the specific role...",
+  "llm_model_used": "gpt-4"
+}
+```
+
+**Response Fields:**
+| Field | Type | Description |
+|-------|------|-------------|
+| status | string | Processing status ("success" or error details) |
+| role_fit | string | Analysis of candidate-role alignment |
+| experience_justification | string | Key experiences matching the job requirements |
+| summary | string | Tailored professional summary for the resume |
+| tailored_resume | string | The complete tailored resume content |
+| llm_model_used | string | The OpenAI model used (gpt-4, gpt-3.5-turbo, etc.) |
+
+**Environment Variables:**
+- `OPENAI_API_KEY` (required): Your OpenAI API key
+- `LLM_MODEL` (optional): Model to use, defaults to "gpt-4"
+- `LLM_MAX_TOKENS` (optional): Maximum tokens for response, defaults to 4000
+- `LLM_TEMPERATURE` (optional): Temperature for generation, defaults to 0.7
+
+**Error Responses:**
+- `422 Validation Error`: Invalid input (resume or job_desc too short or missing)
+- `503 Service Unavailable`: OpenAI API key not configured
+- `500 Internal Server Error`: OpenAI API call failed
+
+**Example cURL:**
+```bash
+curl -X POST "http://localhost:8000/resume/tailor" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resume": "John Doe\nSenior Software Engineer\n5+ years Python experience...",
+    "job_desc": "Looking for a Senior Backend Engineer with Python and AWS experience..."
+  }'
+```
+
 ### Batch Processing
 ```http
 POST /tailor/batch

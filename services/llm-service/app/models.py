@@ -37,3 +37,20 @@ class HealthResponse(BaseModel):
     service: str = Field(default="llm-service", description="Service name")
     version: str = Field(default="1.0.0", description="Service version")
     timestamp: float = Field(default_factory=time.time, description="Response timestamp")
+
+
+# Resume Tailoring Models
+class ResumeTailorRequest(BaseModel):
+    """Request payload for resume tailoring endpoint."""
+    resume: str = Field(..., description="The original resume content to tailor", min_length=10)
+    job_desc: str = Field(..., description="The job description to tailor the resume for", min_length=10)
+
+
+class ResumeTailorResponse(BaseModel):
+    """Response payload for resume tailoring endpoint."""
+    status: str = Field(default="success", description="Processing status")
+    role_fit: str = Field(..., description="Analysis of how the candidate fits the role")
+    experience_justification: str = Field(..., description="Key experiences that justify the candidate for this role")
+    summary: str = Field(..., description="Tailored professional summary")
+    tailored_resume: str = Field(..., description="The complete tailored resume content")
+    llm_model_used: str = Field(..., description="The OpenAI model used for generation")

@@ -2,8 +2,14 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from models import TailoringPayload, TailoredOutput, HealthResponse
-import logging
+from models import (
+    TailoringPayload,
+    TailoredOutput,
+    HealthResponse,
+    ResumeTailorRequest,
+    ResumeTailorResponse,
+)
+from openai_client import OpenAIClient, is_openai_configured
 import structlog
 import time
 import random
@@ -171,3 +177,68 @@ async def health_check():
         version="1.0.0",
         timestamp=time.time()
     )
+
+
+@app.post("/resume/tailor", response_model=ResumeTailorResponse)
+async def tailor_resume_endpoint(payload: ResumeTailorRequest):
+    """
+    Tailor a resume to match a job description using OpenAI.
+
+    This endpoint uses GPT-4 or GPT-3.5 to analyze the job description
+    and tailor the resume with multi-part prompts covering:
+    - Role fit analysis
+    - Experience justification
+    - Professional summary
+    - Complete tailored resume
+
+    Requires OPENAI_API_KEY environment variable to be set.
+    """
+    request_logger = logger.bind(
+        resume_length=len(payload.resume),
+        job_desc_length=len(payload.job_desc),
+    )
+
+    request_logger.info("Processing resume tailoring request")
+
+    # Check if OpenAI is configured
+    if not is_openai_configured():
+        request_logger.error("OpenAI API key not configured")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OpenAI API key is not configured. Please set OPENAI_API_KEY environment variable.",
+        )
+
+    try:
+        # Initialize OpenAI client and tailor resume
+        client = OpenAIClient()
+        result = client.tailor_resume(
+            resume=payload.resume,
+            job_description=payload.job_desc,
+        )
+
+        request_logger.info(
+            "Successfully tailored resume",
+            model_used=client.model,
+        )
+
+        return ResumeTailorResponse(
+            status="success",
+            role_fit=result.get("role_fit", ""),
+            experience_justification=result.get("experience_justification", ""),
+            summary=result.get("summary", ""),
+            tailored_resume=result.get("tailored_resume", ""),
+            llm_model_used=client.model,
+        )
+
+    except ValueError as e:
+        request_logger.error("Configuration error", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e),
+        )
+    except Exception as e:
+        request_logger.error("Resume tailoring failed", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Resume tailoring failed: {str(e)}",
+        )
