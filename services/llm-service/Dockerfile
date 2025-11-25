@@ -43,9 +43,7 @@ USER appuser
 # Add local bin to PATH
 ENV PATH=/home/appuser/.local/bin:$PATH
 
-# OpenAI API Key (set via environment variable for security)
-# The key should be passed at runtime, not built into the image
-ENV OPENAI_API_KEY=""
+# LLM Configuration defaults (OPENAI_API_KEY must be passed at runtime for security)
 ENV LLM_MODEL="gpt-4"
 ENV LLM_MAX_TOKENS="4000"
 ENV LLM_TEMPERATURE="0.7"

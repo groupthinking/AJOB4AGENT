@@ -182,20 +182,30 @@ Ensure the tailored resume maintains professional formatting and authenticity.""
 
         # If parsing failed, put the entire response in tailored_resume
         if not any(sections.values()):
+            logger.warning(
+                "Failed to parse structured response from OpenAI, using raw response",
+                response_length=len(response),
+            )
             sections["tailored_resume"] = response
 
         return sections
 
 
-# Singleton instance for reuse
+# Thread-safe singleton instance for reuse
+import threading
+
 _client_instance: Optional[OpenAIClient] = None
+_client_lock = threading.Lock()
 
 
 def get_openai_client() -> OpenAIClient:
-    """Get or create the OpenAI client singleton."""
+    """Get or create the OpenAI client singleton (thread-safe)."""
     global _client_instance
     if _client_instance is None:
-        _client_instance = OpenAIClient()
+        with _client_lock:
+            # Double-check locking pattern
+            if _client_instance is None:
+                _client_instance = OpenAIClient()
     return _client_instance
 
 

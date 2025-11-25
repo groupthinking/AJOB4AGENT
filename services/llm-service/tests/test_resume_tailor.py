@@ -104,19 +104,18 @@ Responsibilities:
 """
 
 
+# Set allowed hosts for testing at module level
+os.environ["ALLOWED_HOSTS"] = "localhost,127.0.0.1,llm-service,testserver"
+
+
 class TestResumeTailorEndpoint:
     """Tests for the /resume/tailor endpoint."""
 
     @pytest.fixture
     def client(self):
-        """Create a test client with allowed host for testing."""
-        # Set allowed hosts to include testserver before importing
-        with patch.dict(os.environ, {"ALLOWED_HOSTS": "localhost,127.0.0.1,llm-service,testserver"}):
-            # Need to reimport app to pick up the new env var
-            import importlib
-            import main
-            importlib.reload(main)
-            return TestClient(main.app)
+        """Create a test client."""
+        from main import app
+        return TestClient(app)
 
     def test_tailor_endpoint_missing_api_key(self, client):
         """Test that endpoint returns 503 when OPENAI_API_KEY is not set."""
@@ -148,10 +147,10 @@ class TestResumeTailorEndpoint:
         response = client.post("/resume/tailor", json={"resume": SAMPLE_RESUME_1})
         assert response.status_code == 422
 
-    @patch("main.OpenAIClient")
+    @patch("main.get_openai_client")
     @patch("main.is_openai_configured")
     def test_tailor_endpoint_success_sample_1(
-        self, mock_is_configured, mock_client_class, client
+        self, mock_is_configured, mock_get_client, client
     ):
         """Test successful resume tailoring with sample 1."""
         mock_is_configured.return_value = True
@@ -164,7 +163,7 @@ class TestResumeTailorEndpoint:
             "summary": "Experienced backend engineer with cloud expertise.",
             "tailored_resume": "Tailored resume content for Software Engineer role.",
         }
-        mock_client_class.return_value = mock_client
+        mock_get_client.return_value = mock_client
 
         response = client.post(
             "/resume/tailor",
@@ -178,10 +177,10 @@ class TestResumeTailorEndpoint:
         assert data["llm_model_used"] == "gpt-4"
         assert "tailored_resume" in data
 
-    @patch("main.OpenAIClient")
+    @patch("main.get_openai_client")
     @patch("main.is_openai_configured")
     def test_tailor_endpoint_success_sample_2(
-        self, mock_is_configured, mock_client_class, client
+        self, mock_is_configured, mock_get_client, client
     ):
         """Test successful resume tailoring with sample 2 (ML role)."""
         mock_is_configured.return_value = True
@@ -194,7 +193,7 @@ class TestResumeTailorEndpoint:
             "summary": "ML Engineer with NLP and deep learning expertise.",
             "tailored_resume": "Tailored resume content for ML Engineer role.",
         }
-        mock_client_class.return_value = mock_client
+        mock_get_client.return_value = mock_client
 
         response = client.post(
             "/resume/tailor",
@@ -206,10 +205,10 @@ class TestResumeTailorEndpoint:
         assert data["status"] == "success"
         assert "ML Engineer" in data["role_fit"] or "ML" in data["summary"]
 
-    @patch("main.OpenAIClient")
+    @patch("main.get_openai_client")
     @patch("main.is_openai_configured")
     def test_tailor_endpoint_success_sample_3(
-        self, mock_is_configured, mock_client_class, client
+        self, mock_is_configured, mock_get_client, client
     ):
         """Test successful resume tailoring with sample 3 (DevOps/SRE role)."""
         mock_is_configured.return_value = True
@@ -222,7 +221,7 @@ class TestResumeTailorEndpoint:
             "summary": "SRE professional with infrastructure automation skills.",
             "tailored_resume": "Tailored resume content for SRE role.",
         }
-        mock_client_class.return_value = mock_client
+        mock_get_client.return_value = mock_client
 
         response = client.post(
             "/resume/tailor",
@@ -233,17 +232,17 @@ class TestResumeTailorEndpoint:
         data = response.json()
         assert data["status"] == "success"
 
-    @patch("main.OpenAIClient")
+    @patch("main.get_openai_client")
     @patch("main.is_openai_configured")
     def test_tailor_endpoint_api_error(
-        self, mock_is_configured, mock_client_class, client
+        self, mock_is_configured, mock_get_client, client
     ):
         """Test handling of OpenAI API errors."""
         mock_is_configured.return_value = True
 
         mock_client = MagicMock()
         mock_client.tailor_resume.side_effect = Exception("API Error: Rate limit exceeded")
-        mock_client_class.return_value = mock_client
+        mock_get_client.return_value = mock_client
 
         response = client.post(
             "/resume/tailor",
@@ -268,13 +267,9 @@ class TestOpenAIClient:
         """Test is_openai_configured returns False when key is not set."""
         from openai_client import is_openai_configured
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}, clear=False):
-            # Clear the env var
-            env_copy = os.environ.copy()
-            if "OPENAI_API_KEY" in env_copy:
-                del env_copy["OPENAI_API_KEY"]
-            with patch.dict(os.environ, env_copy, clear=True):
-                assert is_openai_configured() is False
+        # Use clear=True with empty dict to remove all env vars including OPENAI_API_KEY
+        with patch.dict(os.environ, {}, clear=True):
+            assert is_openai_configured() is False
 
     def test_openai_client_init_without_api_key(self):
         """Test OpenAI client raises error without API key."""
@@ -331,12 +326,9 @@ class TestHealthEndpoint:
 
     @pytest.fixture
     def client(self):
-        """Create a test client with allowed host for testing."""
-        with patch.dict(os.environ, {"ALLOWED_HOSTS": "localhost,127.0.0.1,llm-service,testserver"}):
-            import importlib
-            import main
-            importlib.reload(main)
-            return TestClient(main.app)
+        """Create a test client."""
+        from main import app
+        return TestClient(app)
 
     def test_health_endpoint(self, client):
         """Test health endpoint returns correct response."""

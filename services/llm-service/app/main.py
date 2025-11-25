@@ -9,7 +9,7 @@ from models import (
     ResumeTailorRequest,
     ResumeTailorResponse,
 )
-from openai_client import OpenAIClient, is_openai_configured
+from openai_client import get_openai_client, is_openai_configured
 import structlog
 import time
 import random
@@ -209,8 +209,8 @@ async def tailor_resume_endpoint(payload: ResumeTailorRequest):
         )
 
     try:
-        # Initialize OpenAI client and tailor resume
-        client = OpenAIClient()
+        # Get or create singleton OpenAI client
+        client = get_openai_client()
         result = client.tailor_resume(
             resume=payload.resume,
             job_description=payload.job_desc,
