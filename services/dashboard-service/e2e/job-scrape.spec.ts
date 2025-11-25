@@ -120,9 +120,8 @@ test.describe('Job Scrape - API Mocking', () => {
   });
 
   test('should handle search API timeout gracefully', async ({ page }) => {
-    // Mock a slow/timeout response
+    // Mock a timeout response immediately
     await page.route('**/api/jobs/search', async (route) => {
-      await new Promise(resolve => setTimeout(resolve, 5000)); // 5s delay
       await route.abort('timedout');
     });
 
