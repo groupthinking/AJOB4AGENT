@@ -100,16 +100,12 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     
     // Find user
     const user = users.get(data.email);
-    
-    if (!user) {
-      res.status(401).json({ error: 'Invalid email or password' });
-      return;
-    }
-    
-    // Verify password
-    const isValid = await verifyPassword(data.password, user.password);
-    
-    if (!isValid) {
+
+    // Always verify password to mitigate timing attacks
+    const passwordHash = user ? user.password : await hashPassword('dummy');
+    const isValid = await verifyPassword(data.password, passwordHash);
+
+    if (!user || !isValid) {
       res.status(401).json({ error: 'Invalid email or password' });
       return;
     }
