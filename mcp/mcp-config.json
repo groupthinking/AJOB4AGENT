@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "jobspy": {
+      "command": "uvx",
+      "args": ["mcp-server-jobspy"],
+      "env": {
+        "JOBSPY_COUNTRY": "USA",
+        "JOBSPY_RESULTS_WANTED": "50"
+      }
+    },
+    "openai": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-openai"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-playwright"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-fetch"]
+    }
+  }
+}
