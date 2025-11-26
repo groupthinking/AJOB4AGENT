@@ -1,5 +1,5 @@
 import { Browser, Page, chromium, BrowserContext } from 'playwright';
-import { Job, SearchFilters, ScraperConfig, JobSearchResult } from '../types/job';
+import { Job, SearchFilters, ScraperConfig } from '../types/job';
 import * as fs from 'fs';
 
 /**
