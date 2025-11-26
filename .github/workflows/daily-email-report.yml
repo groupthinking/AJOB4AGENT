@@ -39,7 +39,7 @@ jobs:
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         SMTP_FROM: ${{ secrets.SMTP_FROM }}
         SMTP_TO: ${{ secrets.SMTP_TO }}
-        APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+        USE_MOCK_DATA: 'true'
       run: |
         cd services/agent-orchestrator
         node dist/reports/daily-email-report.js
