@@ -3,6 +3,7 @@ import { authOptions } from './auth';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { randomBytes } from 'crypto';
 
 // Validation schemas
 export const signUpSchema = z.object({
@@ -90,8 +91,8 @@ export async function generatePasswordResetToken(email: string) {
     return null;
   }
 
-  // Generate token
-  const token = crypto.randomUUID();
+  // Generate cryptographically secure token
+  const token = randomBytes(32).toString('hex');
   const expires = new Date(Date.now() + 3600000); // 1 hour
 
   // Store token
