@@ -1,0 +1,23 @@
+{
+  "name": "ycombinator-mcp-server",
+  "version": "1.0.0",
+  "description": "Y Combinator jobs MCP server for AJOB4AGENT",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn src/index.ts"
+  },
+  "keywords": ["mcp", "ycombinator", "jobs", "startups"],
+  "dependencies": {
+    "@modelcontextprotocol/server": "^1.0.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}

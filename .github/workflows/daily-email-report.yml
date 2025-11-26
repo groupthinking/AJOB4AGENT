@@ -1,0 +1,48 @@
+name: Daily Job Application Report
+
+on:
+  schedule:
+    # Run daily at 9:00 AM UTC (adjust timezone as needed)
+    - cron: '0 9 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  send-daily-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'services/agent-orchestrator/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        cd services/agent-orchestrator
+        npm ci
+        
+    - name: Build application
+      run: |
+        cd services/agent-orchestrator
+        npm run build
+        
+    - name: Generate and send daily report
+      env:
+        SMTP_HOST: ${{ secrets.SMTP_HOST }}
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        SMTP_FROM: ${{ secrets.SMTP_FROM }}
+        SMTP_TO: ${{ secrets.SMTP_TO }}
+        USE_MOCK_DATA: 'true'
+      run: |
+        cd services/agent-orchestrator
+        node dist/reports/daily-email-report.js
+        
+    - name: Log completion
+      run: echo "Daily email report sent successfully"
