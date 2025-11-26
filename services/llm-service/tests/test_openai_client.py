@@ -1,7 +1,6 @@
 """Tests for OpenAI client wrapper."""
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-import json
 
 from src.services.openai_client import OpenAIClient, OpenAIClientError
 

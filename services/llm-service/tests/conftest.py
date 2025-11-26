@@ -1,8 +1,7 @@
 """Pytest fixtures for LLM Service tests."""
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
-import json
 
 from src.models.resume import Resume, Experience, Education
 from src.models.job import JobDescription, TailoringOptions

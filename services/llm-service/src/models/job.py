@@ -1,6 +1,10 @@
 """Job description and tailoring models."""
-from typing import List, Optional
+from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
+
+
+# Allowed OpenAI models for resume tailoring
+ALLOWED_MODELS = Literal["gpt-4", "gpt-4-turbo-preview", "gpt-4o", "gpt-3.5-turbo", "gpt-3.5-turbo-16k"]
 
 
 class JobDescription(BaseModel):
@@ -16,7 +20,7 @@ class JobDescription(BaseModel):
 
 class TailoringOptions(BaseModel):
     """Options for resume tailoring."""
-    model: str = Field(default="gpt-4", description="OpenAI model to use")
+    model: ALLOWED_MODELS = Field(default="gpt-4", description="OpenAI model to use")
     focus_areas: List[str] = Field(
         default_factory=lambda: ["summary", "experience", "skills"],
         description="Sections to focus on tailoring"

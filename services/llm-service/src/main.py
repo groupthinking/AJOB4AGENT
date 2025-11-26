@@ -1,5 +1,4 @@
 """LLM Service - FastAPI application entry point."""
-import logging
 import time
 from contextlib import asynccontextmanager
 

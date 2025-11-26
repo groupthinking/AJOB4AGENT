@@ -11,7 +11,6 @@ Usage:
     LLM_SERVICE_URL=http://custom:8002 python demo_tailoring.py
 """
 import asyncio
-import json
 import os
 import sys
 

@@ -1,11 +1,10 @@
 """Tests for resume tailoring service."""
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 import json
 
 from src.services.resume_tailor import ResumeTailorService
 from src.services.openai_client import OpenAIClientError
-from src.models.resume import Resume, Experience
 from src.models.job import JobDescription, TailoringOptions
 
 
@@ -109,6 +108,34 @@ class TestResumeTailorService:
         result = await service.tailor_resume(sample_resume, sample_job_description)
         
         assert result.tailored_resume.fit_score == 100
+
+    @pytest.mark.asyncio
+    async def test_tailor_resume_fit_score_lower_bound(
+        self,
+        sample_resume,
+        sample_job_description
+    ):
+        """Test that negative fit score is clamped to 0."""
+        mock_client = AsyncMock()
+        
+        # Test with score < 0
+        response_under = {
+            "tailored_resume": {
+                "summary": "Test summary",
+                "experience": [],
+                "skills_highlighted": [],
+                "keywords_matched": [],
+                "fit_score": -25
+            },
+            "suggestions": []
+        }
+        mock_client.chat_completion.return_value = (json.dumps(response_under), 100)
+        mock_client.parse_json_response.return_value = response_under
+        
+        service = ResumeTailorService(openai_client=mock_client)
+        result = await service.tailor_resume(sample_resume, sample_job_description)
+        
+        assert result.tailored_resume.fit_score == 0
 
     def test_calculate_fit_score_high_match(
         self,

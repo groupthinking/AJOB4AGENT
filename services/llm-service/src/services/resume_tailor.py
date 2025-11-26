@@ -1,5 +1,6 @@
 """Resume tailoring service using OpenAI."""
 import logging
+import re
 from typing import Optional
 
 from src.models.resume import Resume
@@ -216,11 +217,13 @@ class ResumeTailorService:
         ]).lower()
         
         # Extract important keywords (words > 4 chars that appear in both)
+        # Use word boundary matching to avoid false positives from substring matches
         job_words = set(word.strip(".,!?;:()[]{}") for word in job_text.split() if len(word) > 4)
         matched = []
         
         for word in job_words:
-            if word in resume_text and word.isalpha():
+            # Use word boundary regex to match whole words only
+            if word.isalpha() and re.search(r'\b' + re.escape(word) + r'\b', resume_text):
                 matched.append(word)
         
         # Return unique keywords, sorted by length (longer = more specific)
