@@ -12,7 +12,6 @@ import {
   Job,
   FieldMapping,
   FormField,
-  ApplicationStatus,
   AdapterNotFoundError,
   DEFAULT_CONFIG
 } from './types';
