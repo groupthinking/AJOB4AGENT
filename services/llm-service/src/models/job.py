@@ -1,7 +1,6 @@
 """Job description and tailoring models."""
 from typing import List, Optional
 from pydantic import BaseModel, Field
-from src.models.resume import Experience
 
 
 class JobDescription(BaseModel):
