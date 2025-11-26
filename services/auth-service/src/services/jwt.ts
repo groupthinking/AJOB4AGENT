@@ -1,7 +1,12 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { TokenPayload } from '../types/user';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-here';
+// Validate JWT_SECRET at startup
+const jwtSecretFromEnv = process.env.JWT_SECRET;
+if (!jwtSecretFromEnv || jwtSecretFromEnv === 'your-jwt-secret-here') {
+  throw new Error('JWT_SECRET environment variable must be set to a secure value');
+}
+const JWT_SECRET: string = jwtSecretFromEnv;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '30d';
 

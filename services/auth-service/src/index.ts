@@ -10,7 +10,12 @@ const app = express();
 const PORT = process.env.AUTH_SERVICE_PORT || 3002;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    : 'http://localhost:3001',
+  credentials: true,
+}));
 app.use(express.json({ limit: '100kb' }));
 
 // Routes
@@ -27,7 +32,8 @@ app.get('/health', (req, res) => {
 });
 
 // Error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal server error',
