@@ -31,7 +31,7 @@ export default function Dashboard() {
         }
         const data: LogEntry[] = await response.json();
         setLogs(data);
-        if (error !== null) setError(null);
+        setError(null);
       } catch (err) {
         console.error('Error fetching logs:', err);
         setError(err instanceof Error ? err.message : String(err));
@@ -44,7 +44,7 @@ export default function Dashboard() {
     // Optional: Set up polling to refresh data periodically
     const interval = setInterval(fetchLogs, 5000); // Refresh every 5 seconds
     return () => clearInterval(interval);
-  }, [error]);
+  }, []);
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '20px' }}>
