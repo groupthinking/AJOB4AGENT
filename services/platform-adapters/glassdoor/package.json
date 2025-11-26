@@ -1,0 +1,48 @@
+{
+  "name": "@platform-adapters/glassdoor",
+  "version": "1.0.0",
+  "description": "Glassdoor platform adapter for job scraping",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "clean": "rm -rf dist",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "glassdoor",
+    "job-scraping",
+    "automation",
+    "job-search"
+  ],
+  "author": "AJOB4AGENT",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.8.10",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "eslint": "^8.53.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  },
+  "peerDependencies": {
+    "playwright": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
