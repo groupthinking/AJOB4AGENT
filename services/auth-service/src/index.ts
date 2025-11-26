@@ -1,0 +1,50 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.AUTH_SERVICE_PORT || 3002;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'auth-service',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🔐 Auth service running on port ${PORT}`);
+  console.log(`   Health check: http://localhost:${PORT}/health`);
+  console.log(`   API endpoints:`);
+  console.log(`   - POST /api/auth/register`);
+  console.log(`   - POST /api/auth/login`);
+  console.log(`   - POST /api/auth/refresh`);
+  console.log(`   - POST /api/auth/logout`);
+  console.log(`   - GET /api/users/me`);
+});
+
+export default app;
