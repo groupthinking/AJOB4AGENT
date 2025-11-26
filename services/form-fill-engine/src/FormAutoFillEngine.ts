@@ -17,7 +17,6 @@ import {
   DEFAULT_CONFIG
 } from './types';
 import { BaseFormAdapter } from './adapters/BaseFormAdapter';
-import { FieldDetector } from './services/FieldDetector';
 import { FieldMapper } from './services/FieldMapper';
 import { LLMFieldMatcher } from './services/LLMFieldMatcher';
 import { FormSubmitter } from './services/FormSubmitter';
