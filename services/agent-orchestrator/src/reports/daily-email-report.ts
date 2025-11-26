@@ -47,7 +47,7 @@ class DailyReportGenerator {
     }
     // TODO: Implement actual database queries for production use
     // For now, throw an error to prevent accidental use in production
-    throw new Error('getDailyData: Real data fetching not implemented. Set USE_MOCK_DATA=true for mock data.');
+    throw new Error('Production data fetching not implemented. This service requires USE_MOCK_DATA=true environment variable for development/testing purposes. Do not use in production until real data fetching is implemented.');
   }
 
   private generateEmailHTML(data: DailyReportData): string {
