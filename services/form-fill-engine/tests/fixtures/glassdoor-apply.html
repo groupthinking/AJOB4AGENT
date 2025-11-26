@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassdoor Apply - Mock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .modal-content {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        [data-test="application-modal"] {
+            display: block;
+        }
+        .application-form {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #0caa41;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #0caa41;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #098f36;
+        }
+        [data-test="next-button"] {
+            background-color: #0caa41;
+        }
+        [data-test="submit-application"] {
+            background-color: #0caa41;
+        }
+        .field-error {
+            color: #d93025;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .required-asterisk {
+            color: red;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #0caa41;
+            padding-bottom: 10px;
+        }
+        .job-title {
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-content" data-test="application-modal">
+        <h2>Apply for this Job</h2>
+        <p class="job-title">Full Stack Developer at StartupXYZ</p>
+        
+        <form class="application-form">
+            <!-- Personal Information -->
+            <div class="form-group">
+                <label for="firstName">First Name <span class="required-asterisk">*</span></label>
+                <input type="text" id="firstName" name="firstName" required data-test="first-name-input">
+                <div class="field-error">First name is required</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name <span class="required-asterisk">*</span></label>
+                <input type="text" id="lastName" name="lastName" required data-test="last-name-input">
+                <div class="field-error">Last name is required</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address <span class="required-asterisk">*</span></label>
+                <input type="email" id="email" name="email" required data-test="email-input">
+                <div class="field-error">Valid email is required</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number <span class="required-asterisk">*</span></label>
+                <input type="tel" id="phone" name="phone" required data-test="phone-input">
+                <div class="field-error">Phone number is required</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="currentLocation">Current Location</label>
+                <input type="text" id="currentLocation" name="currentLocation" placeholder="City, State" data-test="location-input">
+            </div>
+            
+            <!-- Professional Links -->
+            <div class="form-group">
+                <label for="linkedinUrl">LinkedIn URL</label>
+                <input type="url" id="linkedinUrl" name="linkedinUrl" placeholder="https://linkedin.com/in/..." data-test="linkedin-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="portfolioUrl">Portfolio/Personal Website</label>
+                <input type="url" id="portfolioUrl" name="portfolioUrl" placeholder="https://..." data-test="portfolio-input">
+            </div>
+            
+            <!-- Resume Upload -->
+            <div class="form-group">
+                <label for="resumeUpload">Resume/CV <span class="required-asterisk">*</span></label>
+                <input type="file" id="resumeUpload" name="resumeUpload" accept=".pdf,.doc,.docx" required data-test="resume-upload">
+                <div class="field-error">Resume is required</div>
+            </div>
+            
+            <!-- Experience -->
+            <div class="form-group">
+                <label for="experience">Total Years of Experience <span class="required-asterisk">*</span></label>
+                <select id="experience" name="experience" required data-test="experience-select">
+                    <option value="">Select...</option>
+                    <option value="entry">Entry Level (0-2 years)</option>
+                    <option value="mid">Mid Level (3-5 years)</option>
+                    <option value="senior">Senior (6-10 years)</option>
+                    <option value="lead">Lead/Principal (10+ years)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="currentCompany">Current Company</label>
+                <input type="text" id="currentCompany" name="currentCompany" data-test="current-company-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="currentTitle">Current Job Title</label>
+                <input type="text" id="currentTitle" name="currentTitle" data-test="current-title-input">
+            </div>
+            
+            <!-- Salary and Availability -->
+            <div class="form-group">
+                <label for="expectedSalary">Expected Salary</label>
+                <input type="text" id="expectedSalary" name="expectedSalary" placeholder="e.g., $120,000" data-test="salary-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="availability">Earliest Start Date</label>
+                <input type="date" id="availability" name="availability" data-test="availability-input">
+            </div>
+            
+            <!-- Work Authorization -->
+            <div class="form-group">
+                <label for="workAuth">Work Authorization <span class="required-asterisk">*</span></label>
+                <select id="workAuth" name="workAuth" required data-test="work-auth-select">
+                    <option value="">Select...</option>
+                    <option value="citizen">US Citizen</option>
+                    <option value="permanent_resident">Permanent Resident</option>
+                    <option value="work_visa">Work Visa (H1B, L1, etc.)</option>
+                    <option value="student_visa">Student Visa (F1, OPT)</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="requiresSponsorship" name="requiresSponsorship" data-test="sponsorship-checkbox">
+                    I will require visa sponsorship now or in the future
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="willingToRelocate" name="willingToRelocate" data-test="relocate-checkbox">
+                    I am willing to relocate
+                </label>
+            </div>
+            
+            <!-- Cover Letter -->
+            <div class="form-group">
+                <label for="coverLetter">Cover Letter (Optional)</label>
+                <textarea id="coverLetter" name="coverLetter" rows="6" placeholder="Tell us why you're interested in this position..." data-test="cover-letter-textarea"></textarea>
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="form-group">
+                <label for="additionalInfo">Additional Information</label>
+                <textarea id="additionalInfo" name="additionalInfo" rows="4" placeholder="Any other information you'd like to share..." data-test="additional-info-textarea"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" data-test="next-button">Continue</button>
+                <button type="submit" data-test="submit-application">Submit Application</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

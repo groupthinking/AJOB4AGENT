@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Easy Apply - Mock</title>
+    <style>
+        .jobs-easy-apply-modal {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0073b1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #005687;
+        }
+        .artdeco-inline-feedback--error {
+            color: red;
+            display: none;
+        }
+        fieldset {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        legend {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="jobs-easy-apply-modal" data-testid="easy-apply-modal">
+        <h2>Easy Apply</h2>
+        <p>Senior Software Engineer at TechCorp</p>
+        
+        <form class="jobs-easy-apply-form">
+            <div class="jobs-easy-apply-form-section">
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h3>Contact Information</h3>
+                    
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" name="firstName" required aria-required="true">
+                    
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" name="lastName" required aria-required="true">
+                    
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required aria-required="true">
+                    
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" required aria-required="true">
+                    
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location" placeholder="City, State">
+                </div>
+                
+                <!-- Links -->
+                <div class="form-section">
+                    <h3>Links</h3>
+                    
+                    <label for="linkedin">LinkedIn Profile</label>
+                    <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/...">
+                    
+                    <label for="portfolio">Portfolio/Website</label>
+                    <input type="url" id="portfolio" name="portfolio" placeholder="https://...">
+                </div>
+                
+                <!-- Resume -->
+                <div class="form-section">
+                    <h3>Resume</h3>
+                    <label for="resume">Upload Resume (PDF, DOC, DOCX)</label>
+                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
+                </div>
+                
+                <!-- Additional Questions -->
+                <div class="form-section">
+                    <h3>Additional Questions</h3>
+                    
+                    <label for="yearsExperience">Years of Experience *</label>
+                    <select id="yearsExperience" name="yearsExperience" required>
+                        <option value="">Select...</option>
+                        <option value="0-1">0-1 years</option>
+                        <option value="2-4">2-4 years</option>
+                        <option value="5-7">5-7 years</option>
+                        <option value="8-10">8-10 years</option>
+                        <option value="10+">10+ years</option>
+                    </select>
+                    
+                    <fieldset>
+                        <legend>Are you legally authorized to work in the United States? *</legend>
+                        <label>
+                            <input type="radio" name="workAuthorization" value="yes" required> Yes
+                        </label>
+                        <label>
+                            <input type="radio" name="workAuthorization" value="no"> No
+                        </label>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Will you now or in the future require sponsorship? *</legend>
+                        <label>
+                            <input type="radio" name="sponsorship" value="yes" required> Yes
+                        </label>
+                        <label>
+                            <input type="radio" name="sponsorship" value="no"> No
+                        </label>
+                    </fieldset>
+                    
+                    <label for="coverLetter">Cover Letter</label>
+                    <textarea id="coverLetter" name="coverLetter" rows="5" placeholder="Write a cover letter..."></textarea>
+                </div>
+                
+                <!-- Salary -->
+                <div class="form-section">
+                    <label for="salary">Expected Salary (Annual)</label>
+                    <input type="text" id="salary" name="salary" placeholder="e.g., $100,000">
+                    
+                    <label for="startDate">Available Start Date</label>
+                    <input type="date" id="startDate" name="startDate">
+                </div>
+            </div>
+            
+            <div class="artdeco-inline-feedback--error" id="errorMessage">
+                Please fill in all required fields
+            </div>
+            
+            <div class="button-group">
+                <button type="button" aria-label="Continue to next step">Next</button>
+                <button type="button" aria-label="Review your application" style="display:none;">Review</button>
+                <button type="submit" aria-label="Submit application">Submit application</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
