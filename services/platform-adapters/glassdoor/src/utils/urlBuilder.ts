@@ -89,7 +89,12 @@ export function buildGlassdoorSearchUrl(filters: GlassdoorSearchFilters): string
   }
 
   // Company rating filter (minimum stars)
-  if (filters.companyRating && filters.companyRating >= 1 && filters.companyRating <= 5) {
+  if (
+    filters.companyRating !== undefined &&
+    filters.companyRating !== null &&
+    filters.companyRating >= 1 &&
+    filters.companyRating <= 5
+  ) {
     params.minRating = filters.companyRating.toString();
   }
 
