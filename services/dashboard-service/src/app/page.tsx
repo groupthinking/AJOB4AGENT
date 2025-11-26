@@ -31,7 +31,7 @@ export default function Dashboard() {
         }
         const data: LogEntry[] = await response.json();
         setLogs(data);
-        setError(null);
+        if (error !== null) setError(null);
       } catch (err) {
         console.error('Error fetching logs:', err);
         setError(err instanceof Error ? err.message : String(err));
