@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     
     if (token) {
       // TODO: Send email with reset link
-      console.log(`Password reset token generated for ${validatedData.email}: ${token}`);
+      // Token generated for password reset (not logged for security)
     }
     
     // Always return success to prevent email enumeration
