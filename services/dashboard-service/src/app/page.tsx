@@ -20,7 +20,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 export default function Dashboard() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -36,7 +36,7 @@ export default function Dashboard() {
         console.error('Error fetching logs:', err);
         setError(err instanceof Error ? err.message : String(err));
       } finally {
-        setLoading(false);
+        setIsInitialLoad(false);
       }
     };
 
@@ -44,7 +44,7 @@ export default function Dashboard() {
     // Optional: Set up polling to refresh data periodically
     const interval = setInterval(fetchLogs, 5000); // Refresh every 5 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [error]);
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '20px' }}>
@@ -53,7 +53,7 @@ export default function Dashboard() {
         Monitor your automated job application activities in real-time
       </p>
       
-      {loading && <p>Loading application logs...</p>}
+      {isInitialLoad && <p>Loading application logs...</p>}
       
       {error && (
         <div style={{ 
@@ -81,7 +81,7 @@ export default function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {!loading && logs.length === 0 ? (
+          {!isInitialLoad && logs.length === 0 ? (
             <tr>
               <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
                 {error ? 'Unable to load application logs.' : 'No application logs available yet.'}
