@@ -20,6 +20,10 @@ interface GlassdoorJobResult extends JobResult {
 /**
  * Glassdoor adapter for the agent-orchestrator
  * Provides job search capabilities through Glassdoor's platform
+ * 
+ * Note: This adapter is not thread-safe due to the rate limiting implementation.
+ * If concurrent access is required, use separate adapter instances or implement
+ * external synchronization.
  */
 export class GlassdoorAdapter {
   private client: AxiosInstance;
@@ -94,8 +98,8 @@ export class GlassdoorAdapter {
       };
 
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('❌ Glassdoor search failed:', errorMessage);
+      const errorMessage = (error as Error)?.message || 'Unknown error';
+      console.error('❌ Glassdoor search failed:', errorMessage, error);
       return {
         jobs: [],
         totalCount: 0,

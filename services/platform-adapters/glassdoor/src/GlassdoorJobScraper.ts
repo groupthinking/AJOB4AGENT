@@ -128,7 +128,7 @@ export class GlassdoorJobScraper extends BaseJobScraper<GlassdoorJob, GlassdoorS
       const detail = parseJobDetailHtml(html);
 
       // Get basic info from the page
-      const basicInfo = await this.parseBasicInfoFromDetailPage(page);
+      const basicInfo = await this.parseJobFromDetailPage(page);
 
       return {
         ...basicInfo,
@@ -151,9 +151,10 @@ export class GlassdoorJobScraper extends BaseJobScraper<GlassdoorJob, GlassdoorS
   }
 
   /**
-   * Parse basic job info from the detail page
+   * Parse job info from the detail page into a complete GlassdoorJob object.
+   * Note: Returns default values for fields when elements are not found.
    */
-  private async parseBasicInfoFromDetailPage(page: Page): Promise<GlassdoorJob> {
+  private async parseJobFromDetailPage(page: Page): Promise<GlassdoorJob> {
     const title = await page.$eval('[data-test="job-title"], .JobDetails_jobTitle__bFQf_, h1', 
       el => el.textContent?.trim() || ''
     ).catch(() => 'Unknown Title');
@@ -216,84 +217,31 @@ export class GlassdoorJobScraper extends BaseJobScraper<GlassdoorJob, GlassdoorS
 
   /**
    * Handle Glassdoor's anti-bot measures
-   * Override the throttle method with more aggressive rate limiting
+   * Override the throttle method with more aggressive rate limiting and jitter
    */
   protected async throttle(): Promise<void> {
-    const now = Date.now();
-    const elapsed = now - this.lastRequestTime;
-    
     // Use a longer throttle time for Glassdoor (default 3 seconds)
     const throttleMs = this.config.throttleMs || 3000;
 
     // Add some randomness to avoid detection patterns
     const jitter = Math.floor(Math.random() * 1000);
-    const totalDelay = throttleMs + jitter;
-
-    if (elapsed < totalDelay) {
-      const delay = totalDelay - elapsed;
-      console.log(`⏳ Throttling: waiting ${delay}ms`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
-    this.lastRequestTime = Date.now();
+    
+    // Temporarily increase throttle time with jitter
+    const originalThrottleMs = this.config.throttleMs;
+    this.config.throttleMs = throttleMs + jitter;
+    
+    // Call the base class throttle which properly manages lastRequestTime
+    await super.throttle();
+    
+    // Restore original throttle setting
+    this.config.throttleMs = originalThrottleMs;
   }
 
   /**
-   * Search for jobs and handle any login prompts
+   * Hook to handle Glassdoor modals and overlays before parsing job list
    */
-  async search(filters: GlassdoorSearchFilters): Promise<GlassdoorJob[]> {
-    await this.initialize();
-
-    const page = await this.newPage();
-    const allJobs: GlassdoorJob[] = [];
-
-    try {
-      const searchUrl = this.buildSearchUrl(filters);
-      console.log(`🔍 Searching Glassdoor: ${searchUrl}`);
-      
-      await this.throttle();
-      await page.goto(searchUrl, { 
-        waitUntil: 'networkidle',
-        timeout: this.config.timeout 
-      });
-
-      // Handle potential modal or overlay
-      await this.dismissModals(page);
-
-      let pageNum = 1;
-      const maxResults = this.config.maxResults || 50;
-
-      while (allJobs.length < maxResults) {
-        console.log(`📄 Processing page ${pageNum}...`);
-        
-        // Handle modals that might appear mid-session
-        await this.dismissModals(page);
-        
-        const jobs = await this.parseJobList(page);
-        allJobs.push(...jobs);
-
-        console.log(`✅ Total jobs collected: ${allJobs.length}`);
-
-        if (allJobs.length >= maxResults) {
-          break;
-        }
-
-        const hasMore = await this.hasNextPage(page);
-        if (!hasMore) {
-          console.log('📍 No more pages available');
-          break;
-        }
-
-        await this.throttle();
-        await this.goToNextPage(page);
-        pageNum++;
-      }
-
-      return allJobs.slice(0, maxResults);
-
-    } finally {
-      await page.close();
-    }
+  protected async beforeParseJobList(page: Page): Promise<void> {
+    await this.dismissModals(page);
   }
 
   /**

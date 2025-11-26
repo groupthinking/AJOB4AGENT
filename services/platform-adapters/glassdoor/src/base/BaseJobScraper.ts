@@ -25,7 +25,9 @@ export abstract class BaseJobScraper<T extends Job = Job, F extends SearchFilter
       throttleMs: 2000,
       maxResults: 50,
       timeout: 30000,
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      // Use a recent Chrome version for the default User-Agent, or allow override via env var
+      userAgent: process.env.SCRAPER_USER_AGENT ||
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
       ...config
     };
   }
@@ -89,6 +91,14 @@ export abstract class BaseJobScraper<T extends Job = Job, F extends SearchFilter
   }
 
   /**
+   * Hook called before parsing job list on each page.
+   * Subclasses can override to add platform-specific behavior (e.g., dismissing modals).
+   */
+  protected async beforeParseJobList(_page: Page): Promise<void> {
+    // Default implementation does nothing
+  }
+
+  /**
    * Search for jobs with the given filters
    */
   async search(filters: F): Promise<T[]> {
@@ -105,10 +115,16 @@ export abstract class BaseJobScraper<T extends Job = Job, F extends SearchFilter
         timeout: this.config.timeout 
       });
 
+      // Allow subclasses to perform platform-specific setup
+      await this.beforeParseJobList(page);
+
       let pageNum = 1;
       const maxResults = this.config.maxResults || 50;
 
       while (allJobs.length < maxResults) {
+        // Allow subclasses to handle modals or other interruptions before parsing
+        await this.beforeParseJobList(page);
+        
         const jobs = await this.parseJobList(page);
         allJobs.push(...jobs);
 
