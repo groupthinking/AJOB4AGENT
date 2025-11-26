@@ -220,21 +220,22 @@ export class GlassdoorJobScraper extends BaseJobScraper<GlassdoorJob, GlassdoorS
    * Override the throttle method with more aggressive rate limiting and jitter
    */
   protected async throttle(): Promise<void> {
+    const now = Date.now();
+    const elapsed = now - this.lastRequestTime;
+    
     // Use a longer throttle time for Glassdoor (default 3 seconds)
-    const throttleMs = this.config.throttleMs || 3000;
+    const baseThrottleMs = this.config.throttleMs || 3000;
 
     // Add some randomness to avoid detection patterns
     const jitter = Math.floor(Math.random() * 1000);
-    
-    // Temporarily increase throttle time with jitter
-    const originalThrottleMs = this.config.throttleMs;
-    this.config.throttleMs = throttleMs + jitter;
-    
-    // Call the base class throttle which properly manages lastRequestTime
-    await super.throttle();
-    
-    // Restore original throttle setting
-    this.config.throttleMs = originalThrottleMs;
+    const throttleMs = baseThrottleMs + jitter;
+
+    if (elapsed < throttleMs) {
+      const delay = throttleMs - elapsed;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+
+    this.lastRequestTime = Date.now();
   }
 
   /**
