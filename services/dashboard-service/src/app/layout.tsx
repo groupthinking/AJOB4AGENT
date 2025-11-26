@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import AuthProvider from '@/components/providers/SessionProvider'
 
 export const metadata: Metadata = {
-  title: 'Job Application Dashboard',
+  title: 'AJOB4AGENT - Autonomous Job Application System',
   description: 'Monitor and manage automated job applications',
 }
 
@@ -14,9 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-gray-50 min-h-screen">
-        <main className="container mx-auto px-4 py-8">
+        <AuthProvider>
           {children}
-        </main>
+        </AuthProvider>
       </body>
     </html>
   )

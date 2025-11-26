@@ -121,7 +121,9 @@ dist/
 downloads/
 eggs/
 .eggs/
+# Python lib directories, but not src/lib
 lib/
+!**/src/lib/
 lib64/
 parts/
 sdist/
