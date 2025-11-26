@@ -16,7 +16,7 @@ This configuration:
 
 ## Solution Implemented
 
-### 1. Updated API URL Configuration (Commit: 75df9a1)
+### 1. Updated API URL Configuration
 Changed the hardcoded URL to use environment variables:
 ```typescript
 const API_URL = process.env.NEXT_PUBLIC_API_URL 
