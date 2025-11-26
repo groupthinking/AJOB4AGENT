@@ -22,12 +22,24 @@ export class EmailService {
   private config: EmailConfig;
 
   constructor() {
+    // Check for required SMTP environment variables
+    const missingVars: string[] = [];
+    if (!process.env.SMTP_USERNAME) missingVars.push('SMTP_USERNAME');
+    if (!process.env.SMTP_PASSWORD) missingVars.push('SMTP_PASSWORD');
+    if (!process.env.SMTP_FROM) missingVars.push('SMTP_FROM');
+    if (missingVars.length > 0) {
+      throw new Error(
+        `Missing required SMTP environment variable(s): ${missingVars.join(', ')}. ` +
+        `Please set them in your environment or .env file.`
+      );
+    }
+
     this.config = {
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587', 10) || 587,
-      username: process.env.SMTP_USERNAME || '',
-      password: process.env.SMTP_PASSWORD || '',
-      from: process.env.SMTP_FROM || ''
+      username: process.env.SMTP_USERNAME!,
+      password: process.env.SMTP_PASSWORD!,
+      from: process.env.SMTP_FROM!
     };
 
     this.transporter = nodemailer.createTransport({
