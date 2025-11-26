@@ -40,7 +40,6 @@ jobs:
         SMTP_FROM: ${{ secrets.SMTP_FROM }}
         SMTP_TO: ${{ secrets.SMTP_TO }}
         APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
       run: |
         cd services/agent-orchestrator
         node dist/reports/daily-email-report.js
