@@ -165,7 +165,7 @@ class DailyReportGenerator {
       
     } catch (error) {
       console.error('Failed to generate and send daily report:', error);
-      process.exit(1);
+      throw error;
     }
   }
 }
