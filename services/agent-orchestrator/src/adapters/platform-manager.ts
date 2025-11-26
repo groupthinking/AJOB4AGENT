@@ -171,15 +171,8 @@ export class PlatformManager {
       case 'ziprecruiter':
         return await this.jobSpyAdapter.searchJobs(platformParams);
       
-      // Glassdoor - use dedicated adapter if configured, otherwise JobSpy
+      // Glassdoor - always use dedicated adapter
       case 'glassdoor':
-        if (this.useGlassdoorDirect) {
-          return await this.glassdoorAdapter.searchJobs(platformParams);
-        }
-        return await this.jobSpyAdapter.searchJobs(platformParams);
-      
-      // Glassdoor dedicated adapter (explicit)
-      case 'glassdoor-direct':
         return await this.glassdoorAdapter.searchJobs(platformParams);
       
       // Enterprise API platforms
