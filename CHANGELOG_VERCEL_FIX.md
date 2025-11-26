@@ -14,7 +14,7 @@ This URL only works in local development and fails when deployed to Vercel becau
 2. The monitoring service at port 8001 is not available in the browser context
 
 ## Solution
-Updated the API URL to use the environment variable `NEXT_PUBLIC_API_URL` in commit 75df9a1:
+Updated the API URL to use the environment variable `NEXT_PUBLIC_API_URL`:
 ```typescript
 const API_URL = process.env.NEXT_PUBLIC_API_URL 
   ? `${process.env.NEXT_PUBLIC_API_URL}/api/logs`
