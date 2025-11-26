@@ -112,7 +112,7 @@ services:
 
   # LLM Service - AI content generation
   llm-service:
-    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/llm-service:${TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/llm-service:${TAG:-main}
     build:
       context: ./services/llm-service
       target: production
@@ -161,7 +161,7 @@ services:
 
   # Agent Orchestrator - Core coordination service
   agent-orchestrator:
-    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/agent-orchestrator:${TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/agent-orchestrator:${TAG:-main}
     build:
       context: ./services/agent-orchestrator
       target: production
@@ -218,7 +218,7 @@ services:
 
   # Agent Monitoring Service - System analytics
   agent-monitoring-service:
-    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/agent-monitoring-service:${TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/agent-monitoring-service:${TAG:-main}
     build:
       context: ./services/agent-monitoring-service
       target: production
@@ -264,7 +264,7 @@ services:
 
   # Dashboard Service - Next.js frontend
   dashboard-service:
-    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/dashboard-service:${TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-groupthinking/ajob4agent}/dashboard-service:${TAG:-main}
     build:
       context: ./services/dashboard-service
       target: production
