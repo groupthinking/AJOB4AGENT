@@ -5,7 +5,7 @@ import json
 
 from src.services.resume_tailor import ResumeTailorService
 from src.services.openai_client import OpenAIClientError
-from src.models.job import JobDescription, TailoringOptions
+from src.models.job import TailoringOptions
 
 
 class TestResumeTailorService:
