@@ -1,4 +1,4 @@
-import { Job, SearchFilters } from '../types/job';
+import { Job, SearchFilters } from './base/types';
 
 /**
  * Glassdoor-specific job interface with additional fields

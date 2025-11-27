@@ -1,5 +1,15 @@
 import axios, { AxiosInstance } from 'axios';
+import * as cheerio from 'cheerio';
 import { JobSearchParams, JobResult, JobSearchResponse } from '../types/job-search';
+
+// Default User-Agent for Glassdoor requests (Chrome 124 on macOS)
+const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
+// Salary parsing patterns
+// Matches salary ranges like "$80K - $120K", "$80,000 - $120,000", "€80K - €120K"
+const SALARY_RANGE_PATTERN = /[$€£]?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*[kK]?\s*[-–—to]+\s*[$€£]?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*[kK]?/;
+// Matches single salary values like "$80K", "$80,000"
+const SALARY_SINGLE_PATTERN = /[$€£]?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*[kK]?/;
 
 /**
  * Glassdoor-specific job result with additional fields
@@ -40,7 +50,7 @@ export class GlassdoorAdapter {
     this.client = axios.create({
       timeout: 30000,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': process.env.SCRAPER_USER_AGENT || DEFAULT_USER_AGENT,
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9'
       }
@@ -142,42 +152,30 @@ export class GlassdoorAdapter {
     return searchParams;
   }
 
+  /**
+   * Parse job results from HTML using cheerio for robust HTML parsing.
+   * This approach is more reliable than regex patterns and handles
+   * HTML structure variations gracefully.
+   */
   private parseJobResults(html: string, params: JobSearchParams): GlassdoorJobResult[] {
-    // Simple HTML parsing - in production, would use cheerio or similar
+    const $ = cheerio.load(html);
     const jobs: GlassdoorJobResult[] = [];
 
-    // Extract job listings from HTML using regex patterns
-    // Note: This is a simplified implementation. For production,
-    // use the full GlassdoorJobScraper from platform-adapters/glassdoor
-    
-    // Pattern to find job listings
-    const jobPattern = /data-test="jobListing"[^>]*data-id="(\d+)"[^]*?data-test="job-title"[^>]*>([^<]+)</g;
-    let match;
-    let index = 0;
+    // Use multiple selectors to handle Glassdoor's varying HTML structure
+    $('[data-test="jobListing"], .JobsList_jobListItem__JBBUV, .job-search-item, [class*="JobCard"]').each((index, element) => {
+      if (jobs.length >= 25) return false; // Limit results
 
-    while ((match = jobPattern.exec(html)) !== null && jobs.length < 25) {
-      const jobId = match[1];
-      const jobTitle = match[2];
+      const $card = $(element);
+      const job = this.parseJobCard($, $card, index);
+      
+      if (job && job.title && job.company) {
+        jobs.push(job);
+      }
+    });
 
-      jobs.push({
-        id: `glassdoor-${jobId}-${Date.now()}-${index}`,
-        title: jobTitle.trim(),
-        company: this.extractCompany(html, jobId) || 'Unknown Company',
-        location: this.extractLocation(html, jobId) || params.location || 'Remote',
-        description: '',
-        url: `${this.baseUrl}/job-listing/j?jl=${jobId}`,
-        platform: 'glassdoor',
-        datePosted: new Date().toISOString(),
-        easyApply: html.includes('easy-apply'),
-        companyRating: this.extractRating(html, jobId)
-      });
-
-      index++;
-    }
-
-    // If no jobs found through regex, return mock jobs for development
+    // If no jobs found, return informational message for development
     if (jobs.length === 0 && params.searchTerm) {
-      console.log('📋 Glassdoor: Returning sample job format (live scraping requires browser)');
+      console.log('📋 Glassdoor: No jobs found in HTML, returning sample job format');
       jobs.push({
         id: `glassdoor-sample-${Date.now()}`,
         title: `${params.searchTerm} (Glassdoor - requires browser for live data)`,
@@ -194,25 +192,152 @@ export class GlassdoorAdapter {
     return jobs;
   }
 
-  private extractCompany(html: string, jobId: string): string | null {
-    const pattern = new RegExp(`data-id="${jobId}"[^]*?data-test="employer-name"[^>]*>([^<]+)<`, 'i');
-    const match = html.match(pattern);
-    return match ? match[1].trim() : null;
-  }
+  /**
+   * Parse a single job card element using cheerio selectors
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private parseJobCard($: cheerio.CheerioAPI, $card: any, index: number): GlassdoorJobResult | null {
+    try {
+      // Extract job ID from data attribute or link
+      const id = $card.attr('data-id') || 
+                 $card.attr('data-job-id') ||
+                 this.extractJobIdFromLink($card.find('a').first().attr('href') || '') ||
+                 `gd-${Date.now()}-${index}`;
 
-  private extractLocation(html: string, jobId: string): string | null {
-    const pattern = new RegExp(`data-id="${jobId}"[^]*?data-test="emp-location"[^>]*>([^<]+)<`, 'i');
-    const match = html.match(pattern);
-    return match ? match[1].trim() : null;
-  }
+      // Job title - try multiple selectors
+      const title = $card.find('[data-test="job-title"], .JobCard_jobTitle__GLyJ1, .job-title, a[data-test="job-link"]').first().text().trim();
 
-  private extractRating(html: string, jobId: string): number | undefined {
-    const pattern = new RegExp(`data-id="${jobId}"[^]*?data-test="rating"[^>]*>([0-9.]+)<`, 'i');
-    const match = html.match(pattern);
-    if (match) {
-      const rating = parseFloat(match[1]);
-      return isNaN(rating) ? undefined : rating;
+      // Company name
+      const company = $card.find('[data-test="employer-name"], .EmployerProfile_employerName__Xemli, .employer-name, .jobCard_companyName').first().text().trim();
+
+      // Location
+      const location = $card.find('[data-test="emp-location"], .JobCard_location__rCz3x, .location').first().text().trim();
+
+      // Salary
+      const salary = $card.find('[data-test="detailSalary"], .JobCard_salaryEstimate__arV5J, .salary-estimate').first().text().trim();
+
+      // Company rating
+      const ratingText = $card.find('[data-test="rating"], .EmployerProfile_ratingValue__2BBWA, .rating').first().text().trim();
+      const companyRating = ratingText ? this.parseRating(ratingText) : undefined;
+
+      // Easy Apply indicator
+      const easyApply = $card.find('[data-test="easy-apply"], .JobCard_easyApply__fNCsj, .easy-apply').length > 0 ||
+                        $card.text().toLowerCase().includes('easy apply');
+
+      // Job URL
+      let url = $card.find('a[data-test="job-link"], a.JobCard_jobTitle__GLyJ1, a.job-link').first().attr('href') || '';
+      if (url && !url.startsWith('http')) {
+        url = this.baseUrl + url;
+      }
+      if (!url) {
+        url = `${this.baseUrl}/job-listing/j?jl=${id}`;
+      }
+
+      // Posted date
+      const postedDate = $card.find('[data-test="posted-date"], .JobCard_listingAge__KuaxZ, .posting-date').first().text().trim();
+
+      // Only return if we have essential fields
+      if (!title || !company) {
+        return null;
+      }
+
+      return {
+        id: `glassdoor-${id}`,
+        title,
+        company,
+        location: location || 'Location not specified',
+        description: '',
+        url,
+        platform: 'glassdoor',
+        datePosted: postedDate || new Date().toISOString(),
+        easyApply,
+        companyRating,
+        salaryEstimate: salary ? this.parseSalaryEstimate(salary) : undefined
+      };
+    } catch (error) {
+      console.error('Error parsing job card:', error);
+      return null;
     }
+  }
+
+  /**
+   * Extract job ID from URL
+   */
+  private extractJobIdFromLink(url: string): string | null {
+    if (!url) return null;
+    
+    const patterns = [
+      /jl=(\d+)/,
+      /jobListingId=(\d+)/,
+      /-JV_(\d+)/,
+      /\/job\/(\d+)\//
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) {
+        return match[1];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Parse rating string to number
+   */
+  private parseRating(ratingStr: string): number | undefined {
+    if (!ratingStr) return undefined;
+    
+    // Clean up the string and extract numeric value
+    const cleaned = ratingStr.replace(/[^\d.]/g, '');
+    const rating = parseFloat(cleaned);
+    
+    if (isNaN(rating) || rating < 0 || rating > 5) {
+      return undefined;
+    }
+    
+    return Math.round(rating * 10) / 10; // Round to 1 decimal
+  }
+
+  /**
+   * Parse salary string into structured estimate
+   */
+  private parseSalaryEstimate(salaryStr: string): { min: number; max: number; currency: string } | undefined {
+    if (!salaryStr) return undefined;
+
+    // Detect currency
+    let currency = 'USD';
+    if (salaryStr.includes('€')) currency = 'EUR';
+    else if (salaryStr.includes('£')) currency = 'GBP';
+    else if (salaryStr.includes('CAD')) currency = 'CAD';
+
+    // Match salary range pattern
+    const match = salaryStr.match(SALARY_RANGE_PATTERN);
+
+    if (match) {
+      let min = parseFloat(match[1].replace(/,/g, ''));
+      let max = parseFloat(match[2].replace(/,/g, ''));
+
+      // Convert K values to full numbers
+      if (min < 1000 && salaryStr.toLowerCase().includes('k')) {
+        min *= 1000;
+        max *= 1000;
+      }
+
+      return { min, max, currency };
+    }
+
+    // Single value pattern
+    const singleMatch = salaryStr.match(SALARY_SINGLE_PATTERN);
+
+    if (singleMatch) {
+      let value = parseFloat(singleMatch[1].replace(/,/g, ''));
+      if (value < 1000 && salaryStr.toLowerCase().includes('k')) {
+        value *= 1000;
+      }
+      return { min: value, max: value, currency };
+    }
+
     return undefined;
   }
 
