@@ -31,9 +31,8 @@ interface GlassdoorJobResult extends JobResult {
  * Glassdoor adapter for the agent-orchestrator
  * Provides job search capabilities through Glassdoor's platform
  * 
- * Note: This adapter is not thread-safe due to the rate limiting implementation.
- * If concurrent access is required, use separate adapter instances or implement
- * external synchronization.
+ * This adapter implements thread-safe rate limiting using a mutex pattern
+ * to prevent race conditions when multiple concurrent requests are made.
  */
 export class GlassdoorAdapter {
   private client: AxiosInstance;
@@ -45,6 +44,10 @@ export class GlassdoorAdapter {
   private requestCount = 0;
   private rateLimitWindow = 60000; // 1 minute window
   private maxRequestsPerWindow = 20;
+  private windowStartTime = 0;
+
+  // Mutex for thread-safe rate limiting
+  private rateLimitMutex: Promise<void> = Promise.resolve();
 
   constructor() {
     this.client = axios.create({
@@ -60,28 +63,67 @@ export class GlassdoorAdapter {
     this.client.interceptors.request.use(this.rateLimitInterceptor.bind(this));
   }
 
+  /**
+   * Acquires the rate limit mutex to ensure only one request processes rate limiting at a time.
+   * This prevents race conditions when multiple concurrent requests are made.
+   */
+  private async acquireRateLimitLock<T>(fn: () => Promise<T>): Promise<T> {
+    // Chain the new operation after the current mutex resolves
+    const previousMutex = this.rateLimitMutex;
+    let releaseLock!: () => void; // Definite assignment assertion - assigned in Promise constructor
+    
+    // Create a new mutex that will be released when this operation completes
+    this.rateLimitMutex = new Promise<void>(resolve => {
+      releaseLock = resolve;
+    });
+
+    // Wait for previous operations to complete
+    await previousMutex;
+
+    try {
+      return await fn();
+    } finally {
+      // Release the lock for the next operation
+      releaseLock!();
+    }
+  }
+
   private async rateLimitInterceptor(config: any) {
-    const now = Date.now();
-    const timeSinceLastRequest = now - this.lastRequestTime;
+    // Use mutex to ensure thread-safe rate limiting
+    await this.acquireRateLimitLock(async () => {
+      const now = Date.now();
 
-    if (timeSinceLastRequest < this.minRequestInterval) {
-      const delay = this.minRequestInterval - timeSinceLastRequest;
-      console.log(`⏳ Glassdoor rate limiting: waiting ${delay}ms`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
-    if (this.requestCount >= this.maxRequestsPerWindow) {
-      const windowReset = this.lastRequestTime + this.rateLimitWindow;
-      if (now < windowReset) {
-        const delay = windowReset - now;
-        console.log(`⚠️  Glassdoor rate limit reached: waiting ${Math.ceil(delay / 1000)}s`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+      // Reset window if it has expired
+      if (now - this.windowStartTime >= this.rateLimitWindow) {
         this.requestCount = 0;
+        this.windowStartTime = now;
       }
-    }
 
-    this.lastRequestTime = Date.now();
-    this.requestCount++;
+      // Check minimum interval between requests
+      const timeSinceLastRequest = now - this.lastRequestTime;
+      if (timeSinceLastRequest < this.minRequestInterval) {
+        const delay = this.minRequestInterval - timeSinceLastRequest;
+        console.log(`⏳ Glassdoor rate limiting: waiting ${delay}ms`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+
+      // Check requests per window limit
+      if (this.requestCount >= this.maxRequestsPerWindow) {
+        const windowReset = this.windowStartTime + this.rateLimitWindow;
+        const currentTime = Date.now();
+        if (currentTime < windowReset) {
+          const delay = windowReset - currentTime;
+          console.log(`⚠️  Glassdoor rate limit reached: waiting ${Math.ceil(delay / 1000)}s`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          this.requestCount = 0;
+          this.windowStartTime = Date.now();
+        }
+      }
+
+      // Update tracking after acquiring lock and waiting
+      this.lastRequestTime = Date.now();
+      this.requestCount++;
+    });
 
     return config;
   }
@@ -346,7 +388,7 @@ export class GlassdoorAdapter {
    */
   getRateLimitStatus(): { requestCount: number; windowReset: number; canMakeRequest: boolean } {
     const now = Date.now();
-    const windowReset = this.lastRequestTime + this.rateLimitWindow;
+    const windowReset = this.windowStartTime + this.rateLimitWindow;
 
     return {
       requestCount: this.requestCount,
