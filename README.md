@@ -1,5 +1,8 @@
 # AJOB4AGENT - Autonomous Job Application System
 
+![E2E Tests](https://github.com/groupthinking/AJOB4AGENT/workflows/E2E%20Tests/badge.svg)
+![CI/CD Pipeline](https://github.com/groupthinking/AJOB4AGENT/workflows/CI%2FCD%20Pipeline/badge.svg)
+
 An intelligent, microservices-based platform that automates job search, application submission, and recruiter outreach across multiple job platforms including LinkedIn, Glassdoor, and Wellfound.
 
 ## 🚀 Features
