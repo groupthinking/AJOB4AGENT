@@ -25,7 +25,9 @@ export abstract class BaseJobScraper<T extends Job = Job, F extends SearchFilter
       throttleMs: 2000,
       maxResults: 50,
       timeout: 30000,
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      // Use a recent Chrome version for the default User-Agent, or allow override via env var
+      userAgent: process.env.SCRAPER_USER_AGENT ||
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
       ...config
     };
   }
