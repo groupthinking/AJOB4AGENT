@@ -290,7 +290,7 @@ export class GlassdoorJobScraper extends BaseJobScraper<GlassdoorJob, GlassdoorS
 
     // Additional client-side filtering to ensure ratings
     return jobs.filter(job => 
-      !job.companyRating || job.companyRating >= minRating
+      job.companyRating && job.companyRating >= minRating
     );
   }
 
