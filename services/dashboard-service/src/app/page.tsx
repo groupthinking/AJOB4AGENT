@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 // Define the type for a single log entry
 interface LogEntry {
@@ -46,13 +46,13 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Calculate statistics
-  const stats = {
+  // Calculate statistics - memoized to avoid recomputation on every render
+  const stats = useMemo(() => ({
     total: logs.length,
     successful: logs.filter(log => log.status === 'success').length,
     failed: logs.filter(log => log.status === 'failure').length,
     platforms: new Set(logs.map(log => log.platform)).size,
-  };
+  }), [logs]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">

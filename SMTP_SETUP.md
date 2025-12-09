@@ -6,6 +6,8 @@
 - Gmail account with [2-factor authentication enabled](https://myaccount.google.com/signinoptions/two-step-verification)
 - [App password generated](https://myaccount.google.com/apppasswords) from your Google Account settings
 
+**Important:** App passwords can only be generated after you've enabled 2-factor authentication on your Google account. If you don't see the App Passwords option, make sure 2FA is enabled first.
+
 ### 🔧 Environment Variables or GitHub Secrets Required
 
 Configure these variables in your `.env` file or as GitHub secrets:

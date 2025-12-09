@@ -22,13 +22,13 @@ This document lists all items that require your configuration before AJOB4AGENT 
 **Purpose:** Stores application history, job data, and analytics  
 **Current default:**
 ```env
-DATABASE_URL=postgresql://jobagent:password@postgres:5432/jobagent
+DATABASE_URL=postgresql://jobagent:your_secure_password@postgres:5432/jobagent
 POSTGRES_USER=jobagent
-POSTGRES_PASSWORD=password  # ⚠️ CHANGE THIS for production!
+POSTGRES_PASSWORD=your_secure_password_here  # ⚠️ CHANGE THIS for production!
 ```
 
 **Action required:**
-- For production, change `POSTGRES_PASSWORD` to a strong password
+- For production, change `POSTGRES_PASSWORD` to a strong password (minimum 16 characters, mix of letters, numbers, symbols)
 - Update `DATABASE_URL` to match
 
 ---
