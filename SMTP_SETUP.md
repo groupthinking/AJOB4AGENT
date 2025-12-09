@@ -4,26 +4,33 @@
 
 ### 🎯 What You Need
 - Gmail account with [2-factor authentication enabled](https://myaccount.google.com/signinoptions/two-step-verification)
-- [App password generated](https://myaccount.google.com/apppasswords) (you already have: `wusv nhcj hjok vqml`)
+- [App password generated](https://myaccount.google.com/apppasswords) from your Google Account settings
 
-### 🔧 GitHub Secrets Required
+### 🔧 Environment Variables or GitHub Secrets Required
 
-Create these 6 secrets in your repository:
+Configure these variables in your `.env` file or as GitHub secrets:
 
-| Secret Name | Value | Description |
-|-------------|-------|-------------|
-| `SMTP_HOST` | `smtp.gmail.com` | Gmail SMTP server |
-| `SMTP_USERNAME` | `h@haydengarvey.com` | Your Gmail address |
-| `SMTP_PASSWORD` | `wusvnhcjhjokvqml` | Your app password |
-| `SMTP_FROM` | `h@haydengarvey.com` | Same as username |
+| Variable Name | Example Value | Description |
+|---------------|---------------|-------------|
+| `SMTP_HOST` | `smtp.gmail.com` | Your SMTP server |
+| `SMTP_USERNAME` | `your-email@gmail.com` | Your Gmail address |
+| `SMTP_PASSWORD` | `your-app-password` | Your Gmail app password |
+| `SMTP_FROM` | `your-email@gmail.com` | Sender email address |
 | `SMTP_TO` | `recipient@email.com` | Where to receive reports |
-| `SMTP_PORT` | `587` | SMTP port (optional) |
+| `SMTP_PORT` | `587` | SMTP port (optional, defaults to 587) |
+
 
 ### 🚀 Setup Steps
 
+#### For Local Development (.env file):
+1. Copy `.env.example` to `.env`
+2. Add your SMTP credentials to the `.env` file
+3. Never commit the `.env` file to version control
+
+#### For GitHub Actions (Repository Secrets):
 1. **Go to GitHub Secrets:**
    ```
-   https://github.com/groupthinking/AJOB4AGENT/settings/secrets/actions
+   https://github.com/YOUR_USERNAME/AJOB4AGENT/settings/secrets/actions
    ```
 
 2. **Add Each Secret:**
@@ -36,18 +43,18 @@ Create these 6 secrets in your repository:
    gh workflow run email-smoke.yml
    ```
 
-### 📅 When Reports Run
-- **8:00 AM Central Time** (weekdays)
-- **5:45 PM Central Time** (weekdays)
+### 📅 Automated Report Schedule
+Configure in GitHub Actions workflow or cron jobs:
+- Morning reports (e.g., 8:00 AM)
+- Evening reports (e.g., 5:45 PM)
 
-### 🛠️ Helper Script
-Run `./setup_smtp_secrets.sh` for detailed instructions and commands.
-
-### ⚠️ Security Notes
-- App passwords are device-specific
-- Revoke them anytime from Google Account settings
-- Never share or store app passwords in code
+### ⚠️ Security Best Practices
+- **Never commit credentials** to the repository
+- Use app passwords instead of your main Gmail password
+- App passwords are device-specific and can be revoked anytime
+- Store credentials in `.env` files (which are gitignored) or environment variables
+- For production, use secret management services
 
 ---
 
-**✅ Once secrets are set, you'll receive automated daily job search reports!**
+**✅ Once configured, you'll receive automated daily job search reports!**
