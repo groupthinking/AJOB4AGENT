@@ -212,7 +212,7 @@ async function runComprehensiveTests() {
     { name: 'Performance Metrics', test: testPerformanceMetrics }
   ];
   
-  for (const { name, test } of basicTests) {
+  for (const { test } of basicTests) {
     totalTests++;
     if (await test()) {
       passedTests++;

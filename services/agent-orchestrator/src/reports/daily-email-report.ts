@@ -46,8 +46,13 @@ class DailyReportGenerator {
       };
     }
     // TODO: Implement actual database queries for production use
+    // Required database queries:
+    // - Job applications submitted in the past 24 hours
+    // - Interview invitations received
+    // - Application status updates
+    // - Saved jobs awaiting action
     // For now, throw an error to prevent accidental use in production
-    throw new Error('Production data fetching not implemented. This service requires USE_MOCK_DATA=true environment variable for development/testing purposes. Do not use in production until real data fetching is implemented.');
+    throw new Error('Production data fetching not implemented. This service requires USE_MOCK_DATA=true environment variable for development/testing purposes. Implement database queries for: job applications, interview invitations, status updates, and saved jobs before deploying to production.');
   }
 
   private generateEmailHTML(data: DailyReportData): string {

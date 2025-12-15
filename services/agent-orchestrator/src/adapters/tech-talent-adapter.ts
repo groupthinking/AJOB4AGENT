@@ -5,8 +5,8 @@ export class TechTalentAdapter {
   private client: MCPClient;
   private serverPath: string;
 
-  constructor(serverPath: string = '/Users/garvey/Documents/GitHub/AJOB4AGENT/mcp-servers/tech-talent-server/dist/index.js') {
-    this.serverPath = serverPath;
+  constructor(serverPath?: string) {
+    this.serverPath = serverPath || process.env.TECH_TALENT_MCP_SERVER_PATH || './mcp-servers/tech-talent-server/dist/index.js';
     this.client = new MCPClient({
       transport: {
         type: 'stdio',

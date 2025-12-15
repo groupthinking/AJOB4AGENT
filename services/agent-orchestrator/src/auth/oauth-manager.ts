@@ -160,14 +160,8 @@ export class OAuthManager {
       // Get user profile
       const userProfile = await this.getUserProfile(platform, tokenData.access_token);
       
-      // Store the connection (in production, save to database)
-      const accountInfo = {
-        platform,
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
-        profile: userProfile,
-        connectedAt: new Date().toISOString()
-      };
+      // TODO: Store the connection in database
+      // In production, save: platform, accessToken, refreshToken, profile, connectedAt
 
       console.log(`✅ ${platform} OAuth successful for user: ${userProfile.name || userProfile.login}`);
 
