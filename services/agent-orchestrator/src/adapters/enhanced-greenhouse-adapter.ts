@@ -73,18 +73,14 @@ export class EnhancedGreenhouseAdapter {
 
   private async searchJobBoard(params: JobSearchParams): Promise<JobResult[]> {
     try {
-      // First, get all job boards or specific organization's jobs
-      let jobsUrl: string;
-      
-      if (this.organizationToken) {
-        // Use organization-specific endpoint
-        jobsUrl = `${this.baseUrl}/boards/${this.organizationToken}/jobs`;
-      } else {
-        // Use public job boards (limited functionality)
+      // Use public job boards if no organization token (limited functionality)
+      if (!this.organizationToken) {
         console.log('⚠️  No organization token provided, using limited public access');
         return await this.searchPublicJobBoards(params);
       }
-
+      
+      // Use organization-specific endpoint
+      const jobsUrl = `${this.baseUrl}/boards/${this.organizationToken}/jobs`;
       const response = await this.client.get(jobsUrl);
       const allJobs: GreenhouseJobBoard[] = response.data.jobs || response.data;
 
