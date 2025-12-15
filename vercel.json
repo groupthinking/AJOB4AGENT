@@ -1,22 +1,13 @@
 {
   "version": 2,
-  "name": "ajob4agent",
-  "builds": [
-    {
-      "src": "services/dashboard-service/package.json",
-      "use": "@vercel/next@latest",
-      "config": {
-        "zeroConfig": true
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "services/dashboard-service/$1"
-    }
-  ],
+  "framework": "nextjs",
   "installCommand": "cd services/dashboard-service && npm install",
   "buildCommand": "cd services/dashboard-service && npm run build",
-  "outputDirectory": "services/dashboard-service/.next"
+  "outputDirectory": "services/dashboard-service/.next",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/services/dashboard-service/$1"
+    }
+  ]
 }
