@@ -5,8 +5,8 @@ export class YCombinatorAdapter {
   private client: MCPClient;
   private serverPath: string;
 
-  constructor(serverPath: string = '/Users/garvey/Documents/GitHub/AJOB4AGENT/mcp-servers/ycombinator-server/dist/index.js') {
-    this.serverPath = serverPath;
+  constructor(serverPath?: string) {
+    this.serverPath = serverPath || process.env.YC_MCP_SERVER_PATH || './mcp-servers/ycombinator-server/dist/index.js';
     this.client = new MCPClient({
       transport: {
         type: 'stdio',
