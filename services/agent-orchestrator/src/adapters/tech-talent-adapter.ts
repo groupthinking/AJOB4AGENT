@@ -1,17 +1,22 @@
 import { MCPClient } from '@modelcontextprotocol/client';
 import { JobSearchParams, JobResult, JobSearchResponse } from '../types/job-search';
+import path from 'path';
 
 export class TechTalentAdapter {
   private client: MCPClient;
   private serverPath: string;
 
-  constructor(serverPath: string = '/Users/garvey/Documents/GitHub/AJOB4AGENT/mcp-servers/tech-talent-server/dist/index.js') {
-    this.serverPath = serverPath;
+  constructor(serverPath?: string) {
+    // Use environment variable if set, otherwise use project-relative path
+    this.serverPath = serverPath || 
+      process.env.TECH_TALENT_MCP_SERVER_PATH || 
+      path.resolve(process.cwd(), 'mcp-servers/tech-talent-server/dist/index.js');
+    
     this.client = new MCPClient({
       transport: {
         type: 'stdio',
         command: 'node',
-        args: [serverPath]
+        args: [this.serverPath]
       }
     });
   }
