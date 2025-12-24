@@ -4,7 +4,7 @@
 
 ### 🎯 What You Need
 - Gmail account with [2-factor authentication enabled](https://myaccount.google.com/signinoptions/two-step-verification)
-- [App password generated](https://myaccount.google.com/apppasswords) (you already have: `wusv nhcj hjok vqml`)
+- [App password generated](https://myaccount.google.com/apppasswords) (16-character code from Google)
 
 ### 🔧 GitHub Secrets Required
 
@@ -13,9 +13,9 @@ Create these 6 secrets in your repository:
 | Secret Name | Value | Description |
 |-------------|-------|-------------|
 | `SMTP_HOST` | `smtp.gmail.com` | Gmail SMTP server |
-| `SMTP_USERNAME` | `h@haydengarvey.com` | Your Gmail address |
-| `SMTP_PASSWORD` | `wusvnhcjhjokvqml` | Your app password |
-| `SMTP_FROM` | `h@haydengarvey.com` | Same as username |
+| `SMTP_USERNAME` | `your-email@gmail.com` | Your Gmail address |
+| `SMTP_PASSWORD` | `<APP_PASSWORD>` | Your 16-character app password |
+| `SMTP_FROM` | `your-email@gmail.com` | Same as username |
 | `SMTP_TO` | `recipient@email.com` | Where to receive reports |
 | `SMTP_PORT` | `587` | SMTP port (optional) |
 
