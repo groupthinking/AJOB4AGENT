@@ -74,7 +74,7 @@ export class EnhancedGreenhouseAdapter {
   private async searchJobBoard(params: JobSearchParams): Promise<JobResult[]> {
     try {
       // First, get all job boards or specific organization's jobs
-      let jobsUrl = `${this.baseUrl}/boards`;
+      let jobsUrl: string;
       
       if (this.organizationToken) {
         // Use organization-specific endpoint
