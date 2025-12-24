@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "amqplib": "^0.10.3",
-    "axios": "^1.12.1",
+    "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.1.2",
     "cors": "^2.8.5",
@@ -31,7 +31,7 @@
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
-    "playwright": "^1.40.0",
+    "playwright": "^1.55.1",
     "redis": "^4.6.10",
     "stripe": "^14.9.0",
     "winston": "^3.11.0"
