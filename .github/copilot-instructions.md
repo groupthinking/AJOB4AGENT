@@ -74,3 +74,39 @@ AJOB4AGENT is an autonomous job application system that automates job search, ap
 - Ensure all existing tests pass
 - Update documentation if adding new features
 - Keep changes focused and minimal
+
+## MCP Servers Available
+
+The following Model Context Protocol (MCP) servers are configured for use with this project:
+
+- `jobspy` - Search jobs across Indeed, LinkedIn, Glassdoor, ZipRecruiter
+- `openai` - GPT-4 for resume tailoring and cover letter generation
+- `github` - Repository and issue management for application tracking
+- `playwright` - Browser automation for form filling and application submission
+- `fetch` - HTTP requests to external APIs
+
+## MCP Usage Guidelines
+
+When searching for jobs, use the jobspy MCP server:
+```
+Search for "Software Engineer" positions in "New York" across all platforms
+```
+
+When tailoring resumes, use the openai MCP server:
+```
+Tailor this resume for a Backend Engineer role emphasizing Python experience
+```
+
+When automating applications, use the playwright MCP server:
+```
+Navigate to the application page and fill out the form with the candidate's information
+```
+
+When fetching external data, use the fetch MCP server:
+```
+Fetch the company's job listing details from their careers API
+```
+
+### MCP Configuration
+
+MCP server configurations are located in `mcp/mcp-config.json`. See `mcp/README.md` for detailed setup instructions.

@@ -1,0 +1,27 @@
+# Copilot Coding Agent Configuration
+setup_steps:
+  - name: Install Node.js dependencies
+    run: |
+      cd services/agent-orchestrator && npm ci
+      cd ../dashboard-service && npm ci
+
+  - name: Install Python dependencies
+    run: |
+      cd services/llm-service && pip install -r requirements.txt
+
+  - name: Install Playwright browsers
+    run: npx playwright install chromium
+
+firewall:
+  allowlist:
+    # Prisma
+    - checkpoint.prisma.io
+    # npm registry
+    - registry.npmjs.org
+    # PyPI
+    - pypi.org
+    - files.pythonhosted.org
+    # GitHub API
+    - api.github.com
+    # OpenAI (for testing)
+    - api.openai.com
