@@ -46,8 +46,18 @@ class DailyReportGenerator {
       };
     }
     // TODO: Implement actual database queries for production use
-    // For now, throw an error to prevent accidental use in production
-    throw new Error('Production data fetching not implemented. This service requires USE_MOCK_DATA=true environment variable for development/testing purposes. Do not use in production until real data fetching is implemented.');
+    // Required database queries:
+    // 1. SELECT COUNT(*) FROM job_applications WHERE DATE(created_at) = CURRENT_DATE
+    // 2. SELECT COUNT(*) FROM job_applications WHERE status = 'accepted'
+    // 3. SELECT COUNT(*) FROM job_applications WHERE status = 'rejected'
+    // 4. SELECT COUNT(DISTINCT platform) FROM job_applications WHERE DATE(created_at) = CURRENT_DATE
+    // 5. SELECT platform, COUNT(*) as count FROM job_applications WHERE DATE(created_at) = CURRENT_DATE GROUP BY platform
+    throw new Error(
+      'Production data fetching not implemented. This service requires USE_MOCK_DATA=true environment variable for development/testing. ' +
+      'For production use, implement database queries to fetch: (1) job applications count, (2) acceptance/rejection stats, ' +
+      '(3) new jobs found today, and (4) platform-specific statistics from your job_applications table. ' +
+      'See TODO comments in the code for specific query requirements.'
+    );
   }
 
   private generateEmailHTML(data: DailyReportData): string {

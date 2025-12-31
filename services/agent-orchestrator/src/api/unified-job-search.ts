@@ -3,7 +3,6 @@ import { PlatformManager } from '../adapters/platform-manager';
 import { JobSearchParams } from '../types/job-search';
 
 const router = Router();
-let platformManager: PlatformManager;
 
 // Following Anthropic's error recovery and safety patterns
 class UnifiedJobSearchAPI {
